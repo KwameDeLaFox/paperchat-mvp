@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, MessageSquare } from 'lucide-react';
@@ -17,85 +17,42 @@ const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => 
   const [leftWidth, setLeftWidth] = useState(50); // 50% default
   const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
-  const splitterRef = useRef<HTMLDivElement>(null);
 
   // Handle mouse down on splitter
-  const handleMouseDown = (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
     e.preventDefault();
     setIsDragging(true);
-    document.body.style.cursor = 'col-resize';
-    document.body.classList.add('no-select');
-  };
+    
+    const startX = e.clientX;
+    const startWidth = leftWidth;
 
-  // Handle double click to reset to 50/50
-  const handleDoubleClick = () => {
-    setLeftWidth(50);
-  };
-
-  // Handle mouse move for dragging
-  useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      if (!isDragging || !containerRef.current) return;
-
+      if (!containerRef.current) return;
+      
       const containerRect = containerRef.current.getBoundingClientRect();
-      const newLeftWidth = ((e.clientX - containerRect.left) / containerRect.width) * 100;
+      const deltaX = e.clientX - startX;
+      const deltaPercent = (deltaX / containerRect.width) * 100;
+      const newWidth = startWidth + deltaPercent;
       
       // Constrain to reasonable bounds (20% - 80%)
-      const constrainedWidth = Math.max(20, Math.min(80, newLeftWidth));
+      const constrainedWidth = Math.max(20, Math.min(80, newWidth));
       setLeftWidth(constrainedWidth);
     };
 
     const handleMouseUp = () => {
       setIsDragging(false);
-      document.body.style.cursor = '';
-      document.body.classList.remove('no-select');
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-    }
-
-    return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [isDragging]);
 
-  // Handle touch events for mobile
-  const handleTouchStart = (e: React.TouchEvent) => {
-    setIsDragging(true);
-    document.body.classList.add('no-select');
-  };
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  }, [leftWidth]);
 
-  useEffect(() => {
-    const handleTouchMove = (e: TouchEvent) => {
-      if (!isDragging || !containerRef.current) return;
-
-      const touch = e.touches[0];
-      const containerRect = containerRef.current.getBoundingClientRect();
-      const newLeftWidth = ((touch.clientX - containerRect.left) / containerRect.width) * 100;
-      
-      // Constrain to reasonable bounds (20% - 80%)
-      const constrainedWidth = Math.max(20, Math.min(80, newLeftWidth));
-      setLeftWidth(constrainedWidth);
-    };
-
-    const handleTouchEnd = () => {
-      setIsDragging(false);
-      document.body.classList.remove('no-select');
-    };
-
-    if (isDragging) {
-      document.addEventListener('touchmove', handleTouchMove, { passive: false });
-      document.addEventListener('touchend', handleTouchEnd);
-    }
-
-    return () => {
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-    };
-  }, [isDragging]);
+  // Handle double click to reset to 50/50
+  const handleDoubleClick = useCallback(() => {
+    setLeftWidth(50);
+  }, []);
 
   return (
     <div 
@@ -105,7 +62,7 @@ const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => 
     >
       {/* PDF Viewer Section */}
       <div 
-        className={`border-r border-border bg-background overflow-hidden panel-resize ${isDragging ? 'dragging' : ''}`}
+        className="border-r border-border bg-background overflow-hidden"
         style={{ width: `${leftWidth}%` }}
       >
         {documentInfo ? (
@@ -144,25 +101,22 @@ const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => 
 
       {/* Draggable Splitter */}
       <div
-        ref={splitterRef}
-        className={`w-1 splitter cursor-col-resize relative ${isDragging ? 'dragging' : ''}`}
+        className={`w-1 bg-gray-300 hover:bg-blue-400 cursor-col-resize relative transition-colors ${
+          isDragging ? 'bg-blue-400' : ''
+        }`}
         onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
         onDoubleClick={handleDoubleClick}
         title="Drag to resize • Double-click to reset to 50/50"
       >
         {/* Splitter handle */}
-        <div className="splitter-handle"></div>
-        
-        {/* Drag indicator */}
-        {isDragging && (
-          <div className="absolute inset-y-0 -left-1 -right-1 bg-primary opacity-20"></div>
-        )}
+        <div className="absolute inset-y-0 -left-1 -right-1 flex items-center justify-center">
+          <div className="w-1 h-8 bg-gray-400 rounded-full hover:bg-blue-500 transition-colors"></div>
+        </div>
       </div>
 
       {/* Chat Interface Section */}
       <div 
-        className={`flex flex-col bg-background overflow-hidden panel-resize ${isDragging ? 'dragging' : ''}`}
+        className="flex flex-col bg-background overflow-hidden"
         style={{ width: `${100 - leftWidth}%` }}
       >
         <Card className="h-full rounded-none border-0 overflow-hidden">
