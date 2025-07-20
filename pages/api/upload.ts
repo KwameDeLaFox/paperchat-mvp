@@ -2,12 +2,19 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 import formidable from 'formidable';
 import pdf from 'pdf-parse';
 import fs from 'fs';
+import path from 'path';
 
 export const config = {
   api: {
     bodyParser: false,
   },
 };
+
+// Create uploads directory if it doesn't exist
+const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
 
 export default async function handler(
   req: NextApiRequest,
@@ -73,6 +80,16 @@ export default async function handler(
       });
     }
     
+    // Generate unique filename for the uploaded PDF
+    const timestamp = Date.now();
+    const originalName = file.originalFilename || 'document.pdf';
+    const safeName = originalName.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const uniqueFilename = `${timestamp}_${safeName}`;
+    const uploadPath = path.join(uploadsDir, uniqueFilename);
+    
+    // Copy the uploaded file to the uploads directory
+    await fs.promises.copyFile(file.filepath, uploadPath);
+    
     // Clean up temporary file
     try {
       await fs.promises.unlink(file.filepath);
@@ -96,10 +113,12 @@ export default async function handler(
       });
     }
     
+    // Return the text content and the URL to access the PDF file
     res.status(200).json({ 
       text: data.text,
       pages: data.numpages || 1,
-      filename: file.originalFilename || 'document.pdf'
+      filename: originalName,
+      pdfUrl: `/uploads/${uniqueFilename}` // URL to access the uploaded PDF
     });
   } catch (error: any) {
     console.error('Upload error:', error);

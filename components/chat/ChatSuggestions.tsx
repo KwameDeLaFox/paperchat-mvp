@@ -275,12 +275,12 @@ const ChatSuggestions: React.FC<ChatSuggestionsProps> = ({
   if (isLoading) {
     return (
       <div className="px-4 py-3 min-w-0">
-        <div className="text-xs text-gray-500 mb-3 font-medium">
+        <div className="text-xs text-muted-foreground mb-3 font-medium">
           Generating suggestions...
         </div>
         <div className="flex items-center gap-2">
-          <Loader2 className="h-4 w-4 animate-spin text-gray-400 flex-shrink-0" />
-          <span className="text-xs text-gray-500">Analyzing document content...</span>
+          <Loader2 className="h-4 w-4 animate-spin text-muted-foreground flex-shrink-0" />
+          <span className="text-xs text-muted-foreground">Analyzing document content...</span>
         </div>
       </div>
     );
@@ -289,10 +289,10 @@ const ChatSuggestions: React.FC<ChatSuggestionsProps> = ({
   if (error) {
     return (
       <div className="px-4 py-3 min-w-0">
-        <div className="text-xs text-gray-500 mb-3 font-medium">
+        <div className="text-xs text-muted-foreground mb-3 font-medium">
           Suggested questions:
         </div>
-        <div className="text-xs text-gray-400 mb-2">
+        <div className="text-xs text-muted-foreground mb-2">
           {error} - showing general suggestions
         </div>
         <div className="flex flex-wrap gap-2 min-w-0">
@@ -302,7 +302,7 @@ const ChatSuggestions: React.FC<ChatSuggestionsProps> = ({
               variant="outline"
               size="sm"
               onClick={() => onSuggestionClick(suggestion.text)}
-              className="h-auto py-2 px-3 text-xs border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors max-w-full bg-white"
+              className="h-auto py-2 px-3 text-xs max-w-full"
             >
               <span className={`mr-2 ${suggestion.color} flex-shrink-0`}>
                 {suggestion.icon}
@@ -319,7 +319,7 @@ const ChatSuggestions: React.FC<ChatSuggestionsProps> = ({
 
   return (
     <div className="px-4 py-3 min-w-0">
-      <div className="text-xs text-gray-500 mb-3 font-medium">
+      <div className="text-xs text-muted-foreground mb-3 font-medium">
         Suggested questions:
       </div>
       <div className="flex flex-wrap gap-2 min-w-0">
@@ -329,7 +329,7 @@ const ChatSuggestions: React.FC<ChatSuggestionsProps> = ({
             variant="outline"
             size="sm"
             onClick={() => onSuggestionClick(suggestion.text)}
-            className="h-auto py-2 px-3 text-xs border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors max-w-full bg-white"
+            className="h-auto py-2 px-3 text-xs max-w-full"
           >
             <span className={`mr-2 ${suggestion.color} flex-shrink-0`}>
               {suggestion.icon}

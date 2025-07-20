@@ -5,7 +5,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 
 interface FileUploadProps {
-  onFileUpload: (text: string) => void;
+  onFileUpload: (text: string, pdfUrl?: string, filename?: string, pages?: number) => void;
   onError?: (error: string) => void;
 }
 
@@ -90,7 +90,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, onError }) => {
       const data = await response.json();
       
       if (data.text && data.text.trim()) {
-        onFileUpload(data.text);
+        onFileUpload(data.text, data.pdfUrl, data.filename, data.pages);
         clearError();
       } else {
         handleError('processing-failed', 'Unable to extract text from this PDF. The file might be empty or contain only images.', false);
@@ -226,6 +226,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, onError }) => {
 
             <input
               id="file-input"
+              data-testid="file-input"
               type="file"
               accept=".pdf"
               onChange={handleInputChange}

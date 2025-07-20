@@ -109,17 +109,10 @@ body {
   overflow: hidden;
 }
 
-/* React-split gutter styles */
-.gutter {
+/* Custom splitter styles */
+.splitter {
+  width: 4px;
   background-color: #e5e7eb;
-  cursor: col-resize;
-  transition: background-color 0.2s ease;
-}
-
-.gutter:hover {
-  background-color: #3b82f6;
-}
-
-.gutter.gutter-dragging {
-  background-color: #3b82f6;
+  position: relative;
+  flex-shrink: 0;
 }

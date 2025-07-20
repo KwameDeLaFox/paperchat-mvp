@@ -376,5 +376,5 @@ interface Message {
 ```
 
 ---
-globs: *.ts,*.tsx
+alwaysApply: true
 ---

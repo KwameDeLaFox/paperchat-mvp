@@ -1,22 +1,25 @@
 'use client';
 
 import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { FileText, FileImage, Loader2, RefreshCw } from 'lucide-react';
 
 interface PDFViewerProps {
   documentInfo: {
     text: string;
     type: string;
     url?: string;
+    pdfUrl?: string;
   };
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
   const [viewMode, setViewMode] = useState<'pdf' | 'text'>('pdf');
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Get PDF URL - use sample PDF for demo, or actual URL if provided
-  const pdfUrl = documentInfo.url || '/api/sample-pdf';
+  // Get PDF URL - use uploaded PDF if available, otherwise fall back to sample PDF
+  const pdfUrl = documentInfo.pdfUrl || documentInfo.url || '/api/sample-pdf';
 
   const handleIframeLoad = () => {
     setLoading(false);
@@ -31,18 +34,20 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
   if (viewMode === 'text') {
     return (
       <div className="h-full flex flex-col min-w-0">
-        <div className="flex items-center justify-between p-4 border-b bg-gray-50 flex-shrink-0">
-          <h3 className="text-lg font-semibold">Document Text</h3>
-          <button
+        <div className="flex items-center justify-between p-4 border-b border-border bg-muted/50 flex-shrink-0">
+          <h3 className="text-lg font-semibold text-foreground">Document Text</h3>
+          <Button
             onClick={() => setViewMode('pdf')}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            variant="outline"
+            size="sm"
           >
+            <FileImage className="h-4 w-4 mr-2" />
             Switch to PDF View
-          </button>
+          </Button>
         </div>
         <div className="flex-1 overflow-auto p-6 min-w-0">
           <div className="prose max-w-none">
-            <pre className="whitespace-pre-wrap text-sm leading-relaxed break-words">
+            <pre className="whitespace-pre-wrap text-sm leading-relaxed break-words text-foreground">
               {documentInfo.text}
             </pre>
           </div>
@@ -54,49 +59,52 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
   return (
     <div className="h-full flex flex-col min-w-0">
       {/* PDF Controls */}
-      <div className="flex items-center justify-between p-4 border-b bg-gray-50 flex-shrink-0">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-muted/50 flex-shrink-0">
         <div className="flex items-center space-x-4 min-w-0">
-          <h3 className="text-lg font-semibold truncate">PDF Viewer</h3>
+          <h3 className="text-lg font-semibold truncate text-foreground">PDF Viewer</h3>
           
           {/* PDF Info */}
           <div className="flex items-center space-x-2 flex-shrink-0">
-            <span className="text-sm text-gray-600">
+            <span className="text-sm text-muted-foreground">
               Document loaded
             </span>
           </div>
         </div>
 
         {/* View Mode Toggle */}
-        <button
+        <Button
           onClick={() => setViewMode('text')}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex-shrink-0 text-sm"
+          variant="outline"
+          size="sm"
         >
+          <FileText className="h-4 w-4 mr-2" />
           Switch to Text View
-        </button>
+        </Button>
       </div>
 
       {/* PDF Content */}
-      <div className="flex-1 overflow-hidden bg-gray-100 min-w-0 relative">
+      <div className="flex-1 overflow-hidden bg-muted/30 min-w-0 relative">
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 z-10">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/90 z-10">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading PDF...</p>
-              <p className="text-xs text-gray-500 mt-2">URL: {pdfUrl}</p>
+              <Loader2 className="h-12 w-12 animate-spin text-primary mx-auto mb-4" />
+              <p className="text-muted-foreground">Loading PDF...</p>
+              <p className="text-xs text-muted-foreground mt-2">URL: {pdfUrl}</p>
             </div>
           </div>
         )}
 
         {error && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 z-10">
+          <div className="absolute inset-0 flex items-center justify-center bg-background/90 z-10">
             <div className="text-center">
-              <p className="text-red-600 mb-4">{error}</p>
-              <button
+              <p className="text-destructive mb-4">{error}</p>
+              <Button
                 onClick={() => window.location.reload()}
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                variant="outline"
               >
+                <RefreshCw className="h-4 w-4 mr-2" />
                 Retry
-              </button>
+              </Button>
             </div>
           </div>
         )}

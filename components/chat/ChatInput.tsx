@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Send, Loader2 } from 'lucide-react';
 
 interface ChatInputProps {
@@ -36,16 +37,16 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled }) =>
   }, [message]);
 
   return (
-    <form onSubmit={handleSubmit} className="p-3 bg-[#fafafa] border-t border-[#ddd] flex-shrink-0 min-w-0">
+    <form onSubmit={handleSubmit} className="p-3 bg-muted/30 border-t border-border flex-shrink-0 min-w-0">
       <div className="flex gap-2 min-w-0">
         <div className="flex-1 min-w-0">
-          <textarea
+          <Textarea
             ref={textareaRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type a message..."
-            className="w-full px-3 py-2.5 border border-[#ccc] rounded-[20px] text-base resize-none min-h-[44px] max-h-32 min-w-0 focus:outline-none focus:border-[#4f9cff]"
+            className="min-h-[44px] max-h-32 resize-none rounded-full border-border focus:border-ring"
             disabled={isLoading || disabled}
             rows={1}
           />
@@ -53,7 +54,8 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled }) =>
         <Button
           type="submit"
           disabled={!message.trim() || isLoading || disabled}
-          className="px-4 py-2.5 bg-[#4f9cff] text-white rounded-[20px] text-base border-none hover:bg-[#3a8ce6] transition-colors flex-shrink-0"
+          className="rounded-full px-4 py-2.5 flex-shrink-0"
+          size="sm"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
@@ -63,7 +65,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled }) =>
         </Button>
       </div>
       
-      <div className="mt-2 text-xs text-gray-500">
+      <div className="mt-2 text-xs text-muted-foreground">
         Press Enter to send, Shift+Enter for new line
       </div>
     </form>

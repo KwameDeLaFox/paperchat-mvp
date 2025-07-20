@@ -26,10 +26,10 @@ const Message: React.FC<MessageProps> = React.memo(({ message, onFeedback }) => 
         {/* Message Bubble */}
         <div className={`relative px-4 py-3 rounded-[18px] max-w-full min-w-0 ${
           isUser 
-            ? 'bg-[#4f9cff] text-white rounded-br-[4px]' 
+            ? 'bg-primary text-primary-foreground rounded-br-[4px]' 
             : isError
-              ? 'bg-red-50 border border-red-200 text-red-800 rounded-bl-[4px]'
-              : 'bg-[#e0e0e0] text-black rounded-bl-[4px]'
+              ? 'bg-destructive/10 border border-destructive/20 text-destructive rounded-bl-[4px]'
+              : 'bg-muted text-foreground rounded-bl-[4px]'
         }`}>
           <p className="text-sm leading-relaxed break-words overflow-hidden">
             {message.content}
@@ -56,7 +56,7 @@ const Message: React.FC<MessageProps> = React.memo(({ message, onFeedback }) => 
               className={`h-6 w-6 p-0 ${
                 message.feedback === 'helpful' 
                   ? 'text-green-600 bg-green-50' 
-                  : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                  : 'text-muted-foreground hover:text-green-600 hover:bg-green-50'
               }`}
             >
               <ThumbsUp className="h-3 w-3" />
@@ -68,7 +68,7 @@ const Message: React.FC<MessageProps> = React.memo(({ message, onFeedback }) => 
               className={`h-6 w-6 p-0 ${
                 message.feedback === 'unhelpful' 
                   ? 'text-red-600 bg-red-50' 
-                  : 'text-gray-400 hover:text-red-600 hover:bg-red-50'
+                  : 'text-muted-foreground hover:text-red-600 hover:bg-red-50'
               }`}
             >
               <ThumbsDown className="h-3 w-3" />

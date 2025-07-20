@@ -131,5 +131,5 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 8. **Minimal Customization**: Only add layout/spacing classes, let shadcn/ui handle colors and styling
 
 ---
-globs: components/**/*.tsx
+alwaysApply: true
 ---
