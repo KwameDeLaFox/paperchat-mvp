@@ -1,28 +1,26 @@
-import React, { useState, useCallback } from 'react';
-import { Document, Page, pdfjs } from 'react-pdf';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { 
-  ChevronLeft, 
-  ChevronRight, 
-  ZoomIn, 
-  ZoomOut, 
-  RotateCw, 
-  Download, 
-  Copy,
-  FileText
-} from 'lucide-react';
+'use client';
 
-// Set up PDF.js worker
-pdfjs.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.js`;
+import React, { useState, useEffect } from 'react';
+import dynamic from 'next/dynamic';
+
+// Import polyfills first
+import '../../utils/polyfills';
+
+// Dynamically import react-pdf components to avoid SSR issues
+const Document = dynamic(() => import('react-pdf').then(mod => ({ default: mod.Document })), {
+  ssr: false,
+  loading: () => <div className="flex items-center justify-center p-8">Loading PDF viewer...</div>
+});
+
+const Page = dynamic(() => import('react-pdf').then(mod => ({ default: mod.Page })), {
+  ssr: false
+});
 
 interface PDFViewerProps {
   documentInfo: {
     text: string;
-    filename: string;
-    pages: number;
-    isDemo?: boolean;
+    type: string;
+    url?: string;
   };
 }
 
@@ -31,254 +29,149 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1.0);
   const [rotation, setRotation] = useState<number>(0);
+  const [viewMode, setViewMode] = useState<'pdf' | 'text'>('pdf');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [showTextMode, setShowTextMode] = useState<boolean>(false);
 
-  // Get PDF URL based on document type
-  const getPDFUrl = () => {
-    if (documentInfo.isDemo) {
-      return '/api/sample-pdf'; // We'll create this endpoint
-    }
-    // For uploaded files, we'd need to store the file and return its URL
-    // For now, we'll use the demo PDF
-    return '/api/sample-pdf';
-  };
+  // Get PDF URL - use sample PDF for demo, or actual URL if provided
+  const pdfUrl = documentInfo.url || '/api/sample-pdf';
 
-  const onDocumentLoadSuccess = useCallback(({ numPages }: { numPages: number }) => {
+  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
     setLoading(false);
     setError(null);
-  }, []);
+  };
 
-  const onDocumentLoadError = useCallback((error: Error) => {
+  const onDocumentLoadError = (error: Error) => {
     console.error('PDF load error:', error);
-    setError('Failed to load PDF. Showing text version instead.');
+    setError('Failed to load PDF. Please try again.');
     setLoading(false);
-    setShowTextMode(true);
-  }, []);
-
-  const goToPrevPage = () => {
-    setPageNumber(prev => Math.max(prev - 1, 1));
   };
 
-  const goToNextPage = () => {
-    setPageNumber(prev => Math.min(prev + 1, numPages));
+  const changePage = (offset: number) => {
+    setPageNumber(prevPageNumber => {
+      const newPageNumber = prevPageNumber + offset;
+      return Math.min(Math.max(1, newPageNumber), numPages);
+    });
   };
 
-  const zoomIn = () => {
-    setScale(prev => Math.min(prev + 0.2, 3.0));
-  };
-
-  const zoomOut = () => {
-    setScale(prev => Math.max(prev - 0.2, 0.5));
+  const changeScale = (newScale: number) => {
+    setScale(Math.min(Math.max(0.5, newScale), 3.0));
   };
 
   const rotate = () => {
     setRotation(prev => (prev + 90) % 360);
   };
 
-  const copyText = async () => {
-    try {
-      await navigator.clipboard.writeText(documentInfo.text);
-      // You could add a toast notification here
-    } catch (err) {
-      console.error('Failed to copy text:', err);
-    }
+  const resetView = () => {
+    setScale(1.0);
+    setRotation(0);
+    setPageNumber(1);
   };
 
-  const downloadPDF = () => {
-    // For demo, we'll create a text file
-    const blob = new Blob([documentInfo.text], { type: 'text/plain' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${documentInfo.filename}.txt`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  };
-
-  const formatText = (text: string) => {
-    return text
-      .split('\n')
-      .map((paragraph, index) => (
-        <p key={index} className="mb-4 leading-relaxed">
-          {paragraph}
-        </p>
-      ));
-  };
-
-  if (showTextMode) {
+  if (viewMode === 'text') {
     return (
-      <div className="flex flex-col h-full">
-        <CardHeader className="pb-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="text-lg font-semibold">
-                {documentInfo.filename}
-              </CardTitle>
-              <div className="flex items-center gap-2 mt-1">
-                <Badge variant="outline" className="text-xs">
-                  Text Mode
-                </Badge>
-                <span className="text-xs text-gray-500">
-                  {documentInfo.pages} pages
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={copyText}
-                className="h-8 px-3"
-              >
-                <Copy className="h-3 w-3 mr-1" />
-                Copy
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={downloadPDF}
-                className="h-8 px-3"
-              >
-                <Download className="h-3 w-3 mr-1" />
-                Download
-              </Button>
-            </div>
+      <div className="h-full flex flex-col">
+        <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+          <h3 className="text-lg font-semibold">Document Text</h3>
+          <button
+            onClick={() => setViewMode('pdf')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Switch to PDF View
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto p-6">
+          <div className="prose max-w-none">
+            <pre className="whitespace-pre-wrap text-sm leading-relaxed">
+              {documentInfo.text}
+            </pre>
           </div>
-        </CardHeader>
-
-        <CardContent className="flex-1 overflow-y-auto">
-          <div className="prose prose-sm max-w-none">
-            {formatText(documentInfo.text)}
-          </div>
-        </CardContent>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-col h-full">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg font-semibold">
-              {documentInfo.filename}
-            </CardTitle>
-            <div className="flex items-center gap-2 mt-1">
-              <Badge variant="outline" className="text-xs">
-                PDF Viewer
-              </Badge>
-              {numPages > 0 && (
-                <span className="text-xs text-gray-500">
-                  Page {pageNumber} of {numPages}
-                </span>
-              )}
-            </div>
-          </div>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setShowTextMode(true)}
-              className="h-8 px-3"
-            >
-              <FileText className="h-3 w-3 mr-1" />
-              Text Mode
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={copyText}
-              className="h-8 px-3"
-            >
-              <Copy className="h-3 w-3 mr-1" />
-              Copy
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={downloadPDF}
-              className="h-8 px-3"
-            >
-              <Download className="h-3 w-3 mr-1" />
-              Download
-            </Button>
-          </div>
-        </div>
-      </CardHeader>
-
+    <div className="h-full flex flex-col">
       {/* PDF Controls */}
-      <div className="px-6 py-2 border-b bg-gray-50">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={goToPrevPage}
+      <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+        <div className="flex items-center space-x-4">
+          <h3 className="text-lg font-semibold">PDF Viewer</h3>
+          
+          {/* Page Navigation */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => changePage(-1)}
               disabled={pageNumber <= 1}
-              className="h-8 w-8 p-0"
+              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium min-w-[80px] text-center">
-              {pageNumber} / {numPages || '...'}
+              Previous
+            </button>
+            <span className="text-sm">
+              Page {pageNumber} of {numPages}
             </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={goToNextPage}
+            <button
+              onClick={() => changePage(1)}
               disabled={pageNumber >= numPages}
-              className="h-8 w-8 p-0"
+              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+              Next
+            </button>
           </div>
 
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={zoomOut}
+          {/* Zoom Controls */}
+          <div className="flex items-center space-x-2">
+            <button
+              onClick={() => changeScale(scale - 0.25)}
               disabled={scale <= 0.5}
-              className="h-8 w-8 p-0"
+              className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
             >
-              <ZoomOut className="h-4 w-4" />
-            </Button>
-            <span className="text-sm font-medium min-w-[60px] text-center">
-              {Math.round(scale * 100)}%
-            </span>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={zoomIn}
+              -
+            </button>
+            <span className="text-sm min-w-[60px] text-center">{Math.round(scale * 100)}%</span>
+            <button
+              onClick={() => changeScale(scale + 0.25)}
               disabled={scale >= 3.0}
-              className="h-8 w-8 p-0"
+              className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
             >
-              <ZoomIn className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={rotate}
-              className="h-8 w-8 p-0"
-            >
-              <RotateCw className="h-4 w-4" />
-            </Button>
+              +
+            </button>
           </div>
+
+          {/* Rotation */}
+          <button
+            onClick={rotate}
+            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          >
+            Rotate ({rotation}°)
+          </button>
+
+          {/* Reset */}
+          <button
+            onClick={resetView}
+            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+          >
+            Reset
+          </button>
         </div>
+
+        {/* View Mode Toggle */}
+        <button
+          onClick={() => setViewMode('text')}
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+        >
+          Switch to Text View
+        </button>
       </div>
 
       {/* PDF Content */}
-      <CardContent className="flex-1 overflow-auto p-6">
+      <div className="flex-1 overflow-auto p-4 bg-gray-100">
         {loading && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-2"></div>
-              <p className="text-sm text-gray-500">Loading PDF...</p>
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading PDF...</p>
             </div>
           </div>
         )}
@@ -286,14 +179,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
         {error && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
-              <p className="text-sm text-red-500 mb-2">{error}</p>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setShowTextMode(true)}
+              <p className="text-red-600 mb-4">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
-                Switch to Text Mode
-              </Button>
+                Retry
+              </button>
             </div>
           </div>
         )}
@@ -301,12 +193,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
         {!loading && !error && (
           <div className="flex justify-center">
             <Document
-              file={getPDFUrl()}
+              file={pdfUrl}
               onLoadSuccess={onDocumentLoadSuccess}
               onLoadError={onDocumentLoadError}
               loading={
-                <div className="flex items-center justify-center h-64">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                <div className="flex items-center justify-center p-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 </div>
               }
             >
@@ -314,14 +206,16 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
                 pageNumber={pageNumber}
                 scale={scale}
                 rotate={rotation}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                className="shadow-lg"
+                loading={
+                  <div className="flex items-center justify-center p-8">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                  </div>
+                }
               />
             </Document>
           </div>
         )}
-      </CardContent>
+      </div>
     </div>
   );
 };
