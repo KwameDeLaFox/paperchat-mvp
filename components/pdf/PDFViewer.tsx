@@ -1,8 +1,16 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, Download, Copy } from 'lucide-react';
 import { Button } from "@/components/ui/button";
+import SearchBar from './SearchBar';
+
+interface SearchResult {
+  id: number;
+  text: string;
+  index: number;
+  paragraphIndex: number;
+}
 
 interface PDFViewerProps {
   documentText: string;
@@ -17,6 +25,80 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
   pages, 
   isDemo = false 
 }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [highlightedParagraph, setHighlightedParagraph] = useState<number | null>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  // Split text into paragraphs for better display
+  const paragraphs = documentText
+    .split('\n')
+    .filter(paragraph => paragraph.trim().length > 0)
+    .map((paragraph, index) => ({
+      id: index,
+      text: paragraph.trim(),
+      isHeading: paragraph.trim().length < 100 && 
+                 (paragraph.trim().endsWith(':') || 
+                  paragraph.trim().toUpperCase() === paragraph.trim())
+    }));
+
+  const handleSearch = (query: string): SearchResult[] => {
+    if (!query.trim()) return [];
+    
+    const results: SearchResult[] = [];
+    const searchTerm = query.toLowerCase();
+    
+    paragraphs.forEach((paragraph, paragraphIndex) => {
+      const text = paragraph.text.toLowerCase();
+      let index = text.indexOf(searchTerm);
+      
+      while (index !== -1) {
+        results.push({
+          id: results.length,
+          text: paragraph.text.substring(index, index + query.length),
+          index: index,
+          paragraphIndex: paragraphIndex
+        });
+        index = text.indexOf(searchTerm, index + 1);
+      }
+    });
+    
+    return results;
+  };
+
+  const handleResultSelect = (result: SearchResult) => {
+    setHighlightedParagraph(result.paragraphIndex);
+    
+    // Scroll to the highlighted paragraph
+    setTimeout(() => {
+      const element = document.getElementById(`paragraph-${result.paragraphIndex}`);
+      if (element && contentRef.current) {
+        element.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center' 
+        });
+      }
+    }, 100);
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    setHighlightedParagraph(null);
+  };
+
+  const highlightText = (text: string, query: string) => {
+    if (!query.trim()) return text;
+    
+    const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+    const parts = text.split(regex);
+    
+    return parts.map((part, index) => 
+      regex.test(part) ? (
+        <mark key={index} className="bg-yellow-200 dark:bg-yellow-800 px-1 rounded">
+          {part}
+        </mark>
+      ) : part
+    );
+  };
   const handleCopyText = async () => {
     try {
       await navigator.clipboard.writeText(documentText);
@@ -38,18 +120,6 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
   };
-
-  // Split text into paragraphs for better display
-  const paragraphs = documentText
-    .split('\n')
-    .filter(paragraph => paragraph.trim().length > 0)
-    .map((paragraph, index) => ({
-      id: index,
-      text: paragraph.trim(),
-      isHeading: paragraph.trim().length < 100 && 
-                 (paragraph.trim().endsWith(':') || 
-                  paragraph.trim().toUpperCase() === paragraph.trim())
-    }));
 
   return (
     <div className="h-full flex flex-col">
@@ -95,8 +165,15 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
         </div>
       </div>
 
+      {/* Search Bar */}
+      <SearchBar
+        onSearch={handleSearch}
+        onResultSelect={handleResultSelect}
+        onClear={handleClearSearch}
+      />
+
       {/* PDF Content */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div ref={contentRef} className="flex-1 overflow-y-auto p-6">
         {paragraphs.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
             <FileText className="h-12 w-12 mb-4 opacity-50" />
@@ -106,14 +183,22 @@ const PDFViewer: React.FC<PDFViewerProps> = ({
         ) : (
           <div className="max-w-4xl mx-auto space-y-6">
             {paragraphs.map((paragraph) => (
-              <div key={paragraph.id} className="group">
+              <div 
+                key={paragraph.id} 
+                id={`paragraph-${paragraph.id}`}
+                className={`group transition-colors duration-200 ${
+                  highlightedParagraph === paragraph.id 
+                    ? 'bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 pl-4' 
+                    : ''
+                }`}
+              >
                 {paragraph.isHeading ? (
                   <h3 className="text-lg font-semibold text-foreground mb-2 border-b border-border pb-1">
-                    {paragraph.text}
+                    {searchQuery ? highlightText(paragraph.text, searchQuery) : paragraph.text}
                   </h3>
                 ) : (
                   <p className="text-sm leading-relaxed text-foreground">
-                    {paragraph.text}
+                    {searchQuery ? highlightText(paragraph.text, searchQuery) : paragraph.text}
                   </p>
                 )}
               </div>
