@@ -1,20 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-
-// Import polyfills first
-import '../../utils/polyfills';
-
-// Dynamically import react-pdf components to avoid SSR issues
-const Document = dynamic(() => import('react-pdf').then(mod => ({ default: mod.Document })), {
-  ssr: false,
-  loading: () => <div className="flex items-center justify-center p-8">Loading PDF viewer...</div>
-});
-
-const Page = dynamic(() => import('react-pdf').then(mod => ({ default: mod.Page })), {
-  ssr: false
-});
+import React, { useState } from 'react';
 
 interface PDFViewerProps {
   documentInfo: {
@@ -25,10 +11,6 @@ interface PDFViewerProps {
 }
 
 const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
-  const [numPages, setNumPages] = useState<number>(0);
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [scale, setScale] = useState<number>(1.0);
-  const [rotation, setRotation] = useState<number>(0);
   const [viewMode, setViewMode] = useState<'pdf' | 'text'>('pdf');
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,37 +18,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
   // Get PDF URL - use sample PDF for demo, or actual URL if provided
   const pdfUrl = documentInfo.url || '/api/sample-pdf';
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
+  const handleIframeLoad = () => {
     setLoading(false);
     setError(null);
   };
 
-  const onDocumentLoadError = (error: Error) => {
-    console.error('PDF load error:', error);
+  const handleIframeError = () => {
     setError('Failed to load PDF. Please try again.');
     setLoading(false);
-  };
-
-  const changePage = (offset: number) => {
-    setPageNumber(prevPageNumber => {
-      const newPageNumber = prevPageNumber + offset;
-      return Math.min(Math.max(1, newPageNumber), numPages);
-    });
-  };
-
-  const changeScale = (newScale: number) => {
-    setScale(Math.min(Math.max(0.5, newScale), 3.0));
-  };
-
-  const rotate = () => {
-    setRotation(prev => (prev + 90) % 360);
-  };
-
-  const resetView = () => {
-    setScale(1.0);
-    setRotation(0);
-    setPageNumber(1);
   };
 
   if (viewMode === 'text') {
@@ -99,61 +58,12 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
         <div className="flex items-center space-x-4 min-w-0">
           <h3 className="text-lg font-semibold truncate">PDF Viewer</h3>
           
-          {/* Page Navigation */}
+          {/* PDF Info */}
           <div className="flex items-center space-x-2 flex-shrink-0">
-            <button
-              onClick={() => changePage(-1)}
-              disabled={pageNumber <= 1}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-            >
-              Previous
-            </button>
-            <span className="text-sm whitespace-nowrap">
-              Page {pageNumber} of {numPages}
+            <span className="text-sm text-gray-600">
+              Document loaded
             </span>
-            <button
-              onClick={() => changePage(1)}
-              disabled={pageNumber >= numPages}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
-            >
-              Next
-            </button>
           </div>
-
-          {/* Zoom Controls */}
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <button
-              onClick={() => changeScale(scale - 0.25)}
-              disabled={scale <= 0.5}
-              className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 text-sm"
-            >
-              -
-            </button>
-            <span className="text-sm min-w-[60px] text-center whitespace-nowrap">{Math.round(scale * 100)}%</span>
-            <button
-              onClick={() => changeScale(scale + 0.25)}
-              disabled={scale >= 3.0}
-              className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 text-sm"
-            >
-              +
-            </button>
-          </div>
-
-          {/* Rotation */}
-          <button
-            onClick={rotate}
-            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm whitespace-nowrap"
-          >
-            Rotate ({rotation}°)
-          </button>
-
-          {/* Reset */}
-          <button
-            onClick={resetView}
-            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm whitespace-nowrap"
-          >
-            Reset
-          </button>
         </div>
 
         {/* View Mode Toggle */}
@@ -166,18 +76,19 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
       </div>
 
       {/* PDF Content */}
-      <div className="flex-1 overflow-auto p-4 bg-gray-100 min-w-0">
+      <div className="flex-1 overflow-hidden bg-gray-100 min-w-0 relative">
         {loading && (
-          <div className="flex items-center justify-center h-full">
+          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 z-10">
             <div className="text-center">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
               <p className="text-gray-600">Loading PDF...</p>
+              <p className="text-xs text-gray-500 mt-2">URL: {pdfUrl}</p>
             </div>
           </div>
         )}
 
         {error && (
-          <div className="flex items-center justify-center h-full">
+          <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-90 z-10">
             <div className="text-center">
               <p className="text-red-600 mb-4">{error}</p>
               <button
@@ -190,34 +101,13 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
           </div>
         )}
 
-        {!loading && !error && (
-          <div className="flex justify-center w-full">
-            <div className="max-w-full overflow-hidden">
-              <Document
-                file={pdfUrl}
-                onLoadSuccess={onDocumentLoadSuccess}
-                onLoadError={onDocumentLoadError}
-                loading={
-                  <div className="flex items-center justify-center p-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                  </div>
-                }
-              >
-                <Page
-                  pageNumber={pageNumber}
-                  scale={scale}
-                  rotate={rotation}
-                  loading={
-                    <div className="flex items-center justify-center p-8">
-                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                    </div>
-                  }
-                  className="max-w-full h-auto"
-                />
-              </Document>
-            </div>
-          </div>
-        )}
+        <iframe
+          src={pdfUrl}
+          className="w-full h-full border-0"
+          onLoad={handleIframeLoad}
+          onError={handleIframeError}
+          title="PDF Document"
+        />
       </div>
     </div>
   );
