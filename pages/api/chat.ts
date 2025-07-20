@@ -57,8 +57,10 @@ export default async function handler(
     }
 
     // Validate OpenAI API key
-    if (!process.env.OPENAI_API_KEY) {
-      return res.status(500).json({ error: 'OpenAI API key not configured' });
+    if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here') {
+      return res.status(500).json({ 
+        error: 'OpenAI API key not configured. Please set OPENAI_API_KEY in your .env.local file with a valid API key from https://platform.openai.com/account/api-keys' 
+      });
     }
 
     // Chunk text if too long (OpenAI context window is ~4000 tokens)
