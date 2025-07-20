@@ -20,12 +20,7 @@ const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => 
       {/* PDF Viewer Section */}
       <div className="w-2/3 border-r border-border bg-background">
         {documentInfo ? (
-          <PDFViewer
-            documentText={documentInfo.text}
-            filename={documentInfo.filename}
-            pages={documentInfo.pages}
-            isDemo={documentInfo.isDemo}
-          />
+          <PDFViewer documentInfo={documentInfo} />
         ) : (
           <Card className="h-full rounded-none border-0">
             <CardHeader className="border-b border-border bg-muted/50">
