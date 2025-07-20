@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import MessageList from './MessageList';
 import ChatInput from './ChatInput';
+import ChatSuggestions from './ChatSuggestions';
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, RefreshCw } from 'lucide-react';
@@ -44,6 +45,26 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ documentText }) => {
       retryable
     };
     setError(chatError);
+  };
+
+  // Detect document type based on content
+  const detectDocumentType = (): 'research' | 'manual' | 'report' | 'article' | 'general' => {
+    const text = documentText.toLowerCase();
+    
+    if (text.includes('research') || text.includes('study') || text.includes('methodology') || text.includes('findings')) {
+      return 'research';
+    }
+    if (text.includes('manual') || text.includes('guide') || text.includes('instructions') || text.includes('how to')) {
+      return 'manual';
+    }
+    if (text.includes('report') || text.includes('analysis') || text.includes('metrics') || text.includes('recommendations')) {
+      return 'report';
+    }
+    if (text.includes('article') || text.includes('author') || text.includes('argument') || text.includes('evidence')) {
+      return 'article';
+    }
+    
+    return 'general';
   };
 
   const sendMessage = async (content: string, isRetry: boolean = false) => {
@@ -182,6 +203,10 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ documentText }) => {
     }
   };
 
+  const handleSuggestionClick = (suggestion: string) => {
+    sendMessage(suggestion);
+  };
+
   const handleFeedback = async (messageId: string, feedback: 'helpful' | 'unhelpful') => {
     try {
       const response = await fetch('/api/feedback', {
@@ -247,6 +272,14 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ documentText }) => {
         messages={messages} 
         onFeedback={handleFeedback}
       />
+
+      {/* Suggestions (only show when no messages) */}
+      {messages.length === 0 && !isLoading && (
+        <ChatSuggestions 
+          onSuggestionClick={handleSuggestionClick}
+          documentType={detectDocumentType()}
+        />
+      )}
 
       {/* Input */}
       <ChatInput 
