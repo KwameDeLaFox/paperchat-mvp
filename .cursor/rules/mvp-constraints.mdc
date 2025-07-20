@@ -1,3 +1,88 @@
+# MVP Constraints & Guidelines
+
+## MVP Philosophy
+Keep it simple, functional, and focused on core value proposition. Avoid feature creep.
+
+## What's IN Scope (MVP Only)
+
+### Core Features
+- ✅ PDF upload with validation (max 10MB)
+- ✅ Text extraction from PDFs
+- ✅ Basic chat interface with OpenAI integration
+- ✅ Sample PDF demo mode
+- ✅ Feedback loop (thumbs up/down)
+- ✅ Split layout (PDF viewer + chat)
+- ✅ Error handling for common scenarios
+
+### Technical Scope
+- ✅ Next.js with pages router
+- ✅ React functional components
+- ✅ Tailwind CSS + shadcn/ui
+- ✅ In-memory storage (no database)
+- ✅ OpenAI API integration
+- ✅ Basic responsive design
+
+## What's OUT of Scope (Post-MVP)
+
+### Features to Avoid
+- ❌ User accounts/authentication
+- ❌ File storage/persistence
+- ❌ Multiple document support
+- ❌ Document search functionality
+- ❌ Advanced PDF features (annotations, etc.)
+- ❌ Complex analytics dashboard
+- ❌ Real-time collaboration
+- ❌ Mobile app versions
+
+### Technical Complexity to Avoid
+- ❌ Database setup and migrations
+- ❌ Complex state management (Redux, Zustand)
+- ❌ Server-side rendering optimization
+- ❌ Advanced caching strategies
+- ❌ Microservices architecture
+- ❌ Complex deployment pipelines
+
+## Development Guidelines
+
+### Keep It Simple
+- Use basic React hooks (useState, useEffect)
+- Avoid complex libraries unless absolutely necessary
+- Prefer built-in browser APIs over third-party solutions
+- Use simple in-memory storage instead of databases
+
+### Focus on Core Value
+- Every feature should directly support the core use case
+- If a feature doesn't help users chat with PDFs, don't build it
+- Prioritize functionality over polish
+- Get the basic flow working before adding enhancements
+
+### Error Handling
+- Handle common errors gracefully
+- Provide clear, user-friendly error messages
+- Don't build complex error recovery systems
+- Focus on preventing errors rather than complex handling
+
+### Performance
+- Don't optimize prematurely
+- Focus on functionality first
+- Use simple, proven solutions
+- Avoid complex caching or optimization strategies
+
+## Success Criteria
+- User can upload a PDF and get a response within 2 minutes
+- AI responses are relevant to the PDF content
+- Basic error scenarios are handled gracefully
+- Demo mode works for immediate testing
+- Feedback system captures user sentiment
+
+## Timeline Constraints
+- Complete MVP in 5 days maximum
+- Focus on P0 (critical) features first
+- P1 features only if time permits
+- P2+ features are explicitly out of scope
+
+---
+alwaysApply: true
 ---
 description:
 globs:

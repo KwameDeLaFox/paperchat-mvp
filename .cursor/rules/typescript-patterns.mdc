@@ -1,0 +1,384 @@
+# TypeScript Patterns & Best Practices
+
+## Type Definitions
+
+### Basic Types
+```typescript
+// Use specific types instead of any
+const message: string = 'Hello';
+const count: number = 42;
+const isActive: boolean = true;
+const items: string[] = ['item1', 'item2'];
+const user: { name: string; age: number } = { name: 'John', age: 30 };
+```
+
+### Interface Definitions
+```typescript
+// Define interfaces for complex objects
+interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'ai';
+  timestamp: Date;
+  feedback?: 'helpful' | 'unhelpful';
+}
+
+interface UploadResponse {
+  filename: string;
+  size: number;
+  pages: number;
+  text: string;
+}
+
+interface ChatRequest {
+  message: string;
+  documentText: string;
+}
+
+interface ChatResponse {
+  response: string;
+  messageId: string;
+  timestamp: string;
+}
+```
+
+### Component Props
+```typescript
+interface FileUploadProps {
+  onFileSelect: (file: File) => void;
+  isUploading: boolean;
+  error?: string;
+  accept?: string;
+  maxSize?: number;
+}
+
+interface MessageProps {
+  message: Message;
+  onFeedback?: (messageId: string, feedback: 'helpful' | 'unhelpful') => void;
+}
+
+interface ChatInputProps {
+  onSend: (message: string) => void;
+  isLoading: boolean;
+  disabled?: boolean;
+}
+```
+
+## State Management Types
+
+### useState with Types
+```typescript
+// Explicit typing for state
+const [messages, setMessages] = useState<Message[]>([]);
+const [file, setFile] = useState<File | null>(null);
+const [isLoading, setIsLoading] = useState<boolean>(false);
+const [error, setError] = useState<string | null>(null);
+
+// Complex state object
+interface AppState {
+  document: File | null;
+  documentText: string;
+  messages: Message[];
+  isDemoMode: boolean;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const [state, setState] = useState<AppState>({
+  document: null,
+  documentText: '',
+  messages: [],
+  isDemoMode: false,
+  isLoading: false,
+  error: null,
+});
+```
+
+### Event Handler Types
+```typescript
+// Form events
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  // Handle form submission
+};
+
+// Input events
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  setValue(e.target.value);
+};
+
+// File events
+const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  if (file) {
+    setFile(file);
+  }
+};
+
+// Button events
+const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  // Handle button click
+};
+```
+
+## API Response Types
+
+### Fetch with Types
+```typescript
+// Define response types
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+}
+
+// Use in fetch calls
+const uploadFile = async (file: File): Promise<ApiResponse<UploadResponse>> => {
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    const response = await fetch('/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    return {
+      success: false,
+      error: 'Upload failed',
+    };
+  }
+};
+
+// Usage
+const handleUpload = async (file: File) => {
+  const result = await uploadFile(file);
+  if (result.success && result.data) {
+    setDocumentText(result.data.text);
+  } else {
+    setError(result.error || 'Upload failed');
+  }
+};
+```
+
+## Utility Function Types
+
+### Generic Functions
+```typescript
+// Generic utility functions
+function chunkText<T>(text: string, maxLength: number): string[] {
+  // Implementation
+}
+
+function debounce<T extends (...args: any[]) => any>(
+  func: T,
+  delay: number
+): (...args: Parameters<T>) => void {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: Parameters<T>) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+}
+
+// Usage
+const debouncedSearch = debounce((query: string) => {
+  // Perform search
+}, 300);
+```
+
+### Type Guards
+```typescript
+// Type guards for runtime type checking
+function isMessage(obj: any): obj is Message {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.id === 'string' &&
+    typeof obj.content === 'string' &&
+    (obj.sender === 'user' || obj.sender === 'ai')
+  );
+}
+
+function isUploadResponse(obj: any): obj is UploadResponse {
+  return (
+    typeof obj === 'object' &&
+    typeof obj.filename === 'string' &&
+    typeof obj.size === 'number' &&
+    typeof obj.pages === 'number' &&
+    typeof obj.text === 'string'
+  );
+}
+
+// Usage
+const processResponse = (data: unknown) => {
+  if (isUploadResponse(data)) {
+    // TypeScript knows data is UploadResponse
+    setDocumentText(data.text);
+  }
+};
+```
+
+## Error Handling Types
+
+### Custom Error Types
+```typescript
+class UploadError extends Error {
+  constructor(
+    message: string,
+    public code: 'FILE_TOO_LARGE' | 'INVALID_TYPE' | 'PROCESSING_FAILED'
+  ) {
+    super(message);
+    this.name = 'UploadError';
+  }
+}
+
+class ApiError extends Error {
+  constructor(
+    message: string,
+    public statusCode: number,
+    public code?: string
+  ) {
+    super(message);
+    this.name = 'ApiError';
+  }
+}
+
+// Usage
+const handleUpload = async (file: File) => {
+  try {
+    if (file.size > 10 * 1024 * 1024) {
+      throw new UploadError('File too large', 'FILE_TOO_LARGE');
+    }
+    
+    const result = await uploadFile(file);
+    if (!result.success) {
+      throw new ApiError(result.error || 'Upload failed', 500);
+    }
+    
+    return result.data;
+  } catch (error) {
+    if (error instanceof UploadError) {
+      // Handle upload-specific errors
+      setError(`Upload error: ${error.message}`);
+    } else if (error instanceof ApiError) {
+      // Handle API errors
+      setError(`API error: ${error.message}`);
+    } else {
+      // Handle unknown errors
+      setError('An unexpected error occurred');
+    }
+  }
+};
+```
+
+## Component Type Patterns
+
+### Function Component with Props
+```typescript
+import React from 'react';
+
+interface ComponentProps {
+  title: string;
+  children?: React.ReactNode;
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
+const MyComponent: React.FC<ComponentProps> = ({
+  title,
+  children,
+  onClick,
+  disabled = false,
+}) => {
+  return (
+    <div>
+      <h2>{title}</h2>
+      {children}
+      <button onClick={onClick} disabled={disabled}>
+        Click me
+      </button>
+    </div>
+  );
+};
+
+export default MyComponent;
+```
+
+### Custom Hook Types
+```typescript
+interface UseChatReturn {
+  messages: Message[];
+  sendMessage: (content: string) => Promise<void>;
+  isLoading: boolean;
+  error: string | null;
+}
+
+const useChat = (documentText: string): UseChatReturn => {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const sendMessage = async (content: string) => {
+    // Implementation
+  };
+
+  return {
+    messages,
+    sendMessage,
+    isLoading,
+    error,
+  };
+};
+```
+
+## Best Practices
+
+### Avoid `any` Type
+```typescript
+// ❌ Don't do this
+const data: any = response.json();
+
+// ✅ Do this instead
+const data: ApiResponse<UploadResponse> = response.json();
+```
+
+### Use Union Types
+```typescript
+// ✅ Use union types for specific values
+type MessageSender = 'user' | 'ai';
+type FeedbackType = 'helpful' | 'unhelpful' | null;
+type LoadingState = 'idle' | 'loading' | 'success' | 'error';
+```
+
+### Optional Properties
+```typescript
+// ✅ Use optional properties when appropriate
+interface Message {
+  id: string;
+  content: string;
+  sender: 'user' | 'ai';
+  timestamp: Date;
+  feedback?: 'helpful' | 'unhelpful'; // Optional
+}
+```
+
+### Readonly Properties
+```typescript
+// ✅ Use readonly for immutable properties
+interface Message {
+  readonly id: string;
+  readonly timestamp: Date;
+  content: string; // Mutable
+}
+```
+
+---
+alwaysApply: true
+---
+description:
+globs:
+alwaysApply: false
+---

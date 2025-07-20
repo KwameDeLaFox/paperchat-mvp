@@ -1,3 +1,41 @@
+# PaperChat MVP Project Overview
+
+This is a Next.js MVP for PaperChat - an AI-powered PDF chat application. The project follows the specifications in [TODO.md](mdc:TODO.md).
+
+## Core Concept
+Users upload a PDF and can ask questions about it through a chat interface. The AI responds based on the PDF content.
+
+## Tech Stack
+- **Frontend**: Next.js (pages router) + Tailwind CSS + shadcn/ui
+- **Backend**: Node.js/Express (API routes)
+- **PDF Processing**: pdf-parse library
+- **AI**: OpenAI API
+- **Storage**: In-memory only (no database)
+- **Deployment**: Vercel
+
+## Key Features (MVP)
+1. PDF Upload with validation (max 10MB)
+2. Sample PDF demo mode
+3. Basic chat interface with OpenAI integration
+4. Feedback loop (thumbs up/down)
+5. Split layout: PDF viewer + chat interface
+
+## Project Structure
+- `/pages` - Next.js pages and API routes
+- `/components` - React components
+- `/utils` - Utility functions
+- `/public` - Static assets
+
+## Development Priority
+Follow the TODO timeline: Upload → Chat → Demo → Feedback → Polish
+
+## Git Workflow
+- Commit after each milestone
+- Push to GitHub regularly
+- Use descriptive commit messages
+
+---
+alwaysApply: true
 ---
 description:
 globs:
