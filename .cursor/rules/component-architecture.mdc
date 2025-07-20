@@ -343,5 +343,5 @@ const Message = ({ message, onFeedback, testId }) => {
 ```
 
 ---
-alwaysApply: false
+alwaysApply: true
 ---
