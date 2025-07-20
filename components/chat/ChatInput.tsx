@@ -37,7 +37,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled }) =>
   }, [message]);
 
   return (
-    <form onSubmit={handleSubmit} className="border-t border-gray-200 p-4">
+    <form onSubmit={handleSubmit} className="border-t border-border p-4 bg-background">
       <div className="flex space-x-2">
         <div className="flex-1">
           <Textarea
@@ -65,7 +65,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled }) =>
         </Button>
       </div>
       
-      <div className="mt-2 text-xs text-gray-500">
+      <div className="mt-2 text-xs text-muted-foreground">
         Press Enter to send, Shift+Enter for new line
       </div>
     </form>

@@ -14,16 +14,16 @@ interface SplitLayoutProps {
 
 const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => {
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div className="flex h-screen bg-muted/30">
       {/* PDF Viewer Section */}
-      <div className="w-2/3 border-r border-gray-200 bg-white">
+      <div className="w-2/3 border-r border-border bg-background">
         <Card className="h-full rounded-none border-0">
-          <CardHeader className="border-b border-gray-200 bg-gray-50">
+          <CardHeader className="border-b border-border bg-muted/50">
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-3">
-                <FileText className="h-5 w-5 text-gray-600" />
+                <FileText className="h-5 w-5 text-muted-foreground" />
                 <div>
-                  <CardTitle className="text-lg font-semibold text-gray-900">
+                  <CardTitle className="text-lg font-semibold text-foreground">
                     {documentInfo?.filename || 'Document Viewer'}
                   </CardTitle>
                   <div className="flex items-center space-x-2 mt-1">
@@ -44,7 +44,7 @@ const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => 
             <div className="p-6">
               {/* PDF content will be rendered here */}
               <div className="prose max-w-none">
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   Document content will be displayed here...
                 </p>
               </div>
@@ -54,12 +54,12 @@ const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => 
       </div>
 
       {/* Chat Interface Section */}
-      <div className="w-1/3 flex flex-col bg-white">
+      <div className="w-1/3 flex flex-col bg-background">
         <Card className="h-full rounded-none border-0">
-          <CardHeader className="border-b border-gray-200 bg-gray-50">
+          <CardHeader className="border-b border-border bg-muted/50">
             <div className="flex items-center space-x-2">
-              <MessageSquare className="h-5 w-5 text-gray-600" />
-              <CardTitle className="text-lg font-semibold text-gray-900">
+              <MessageSquare className="h-5 w-5 text-muted-foreground" />
+              <CardTitle className="text-lg font-semibold text-foreground">
                 Chat with Document
               </CardTitle>
             </div>

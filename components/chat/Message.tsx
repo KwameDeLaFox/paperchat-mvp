@@ -23,7 +23,7 @@ const Message: React.FC<MessageProps> = ({ message, onFeedback }) => {
   return (
     <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-4`}>
       <div className={`max-w-[80%] ${isUser ? 'order-2' : 'order-1'}`}>
-        <Card className={`${isUser ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
+        <Card className={`${isUser ? 'bg-primary text-primary-foreground shadow-md' : 'bg-card border shadow-sm'}`}>
           <CardContent className="p-3">
             <div className="space-y-2">
               {/* Message content */}
