@@ -1,0 +1,114 @@
+# Development Workflow & Git Strategy
+
+## Git Workflow
+
+### Commit Strategy
+- **Commit after each milestone** (not every small change)
+- **Use descriptive commit messages** with milestone numbers
+- **Push to GitHub regularly** after each milestone
+- **Test before committing** to ensure functionality
+
+### Commit Message Format
+```
+Milestone X: Brief description of what was accomplished
+
+Examples:
+- Milestone 1: Install core dependencies (pdf-parse, openai)
+- Milestone 2: Install shadcn/ui components and setup design system
+- Milestone 3: Create core API endpoints (upload, chat, sample, feedback)
+- Milestone 4: Implement file upload component with validation
+- Milestone 5: Build chat interface with OpenAI integration
+```
+
+### Branch Strategy
+- **Main branch** for all development (simple workflow)
+- **No feature branches** for MVP (keep it simple)
+- **Direct commits** to main with proper testing
+
+## Development Process
+
+### Before Starting Each Milestone
+1. **Check TODO.md** for current priorities
+2. **Review previous milestone** to understand context
+3. **Plan the implementation** based on specifications
+4. **Ensure dependencies** are installed
+
+### During Development
+1. **Follow Cursor rules** for consistent patterns
+2. **Use shadcn/ui components** with default styling
+3. **Test functionality** as you build
+4. **Keep it simple** - avoid over-engineering
+
+### After Each Milestone
+1. **Test the functionality** thoroughly
+2. **Commit with descriptive message**
+3. **Push to GitHub**
+4. **Update TODO.md** progress
+5. **Plan next milestone**
+
+## Testing Strategy
+
+### Manual Testing Checklist
+- [ ] Component renders without errors
+- [ ] User interactions work as expected
+- [ ] API endpoints respond correctly
+- [ ] Error states are handled gracefully
+- [ ] Mobile responsiveness works
+- [ ] No console errors
+
+### Before Committing
+- [ ] Run `npm run build` to check for errors
+- [ ] Test the specific functionality added
+- [ ] Ensure no breaking changes to existing features
+- [ ] Check that the app still starts and runs
+
+## Error Handling
+
+### Development Errors
+- **Fix immediately** if it's a simple issue
+- **Research solutions** for complex problems
+- **Ask for help** if stuck for more than 15 minutes
+- **Document solutions** for future reference
+
+### User-Facing Errors
+- **Provide clear error messages**
+- **Handle common failure scenarios**
+- **Don't let errors crash the app**
+- **Log errors for debugging**
+
+## Code Quality
+
+### Standards
+- **Use TypeScript** for type safety
+- **Follow React best practices**
+- **Use consistent naming conventions**
+- **Add comments for complex logic**
+- **Keep components focused and simple**
+
+### File Organization
+- **Group related components** in appropriate folders
+- **Use descriptive file names**
+- **Keep files under 200 lines** when possible
+- **Separate concerns** (UI, logic, API)
+
+## Performance Considerations
+
+### MVP Focus
+- **Don't optimize prematurely**
+- **Focus on functionality first**
+- **Use simple, proven solutions**
+- **Avoid complex caching strategies**
+
+### Basic Performance
+- **Lazy load components** if needed
+- **Optimize bundle size** by importing only what's needed
+- **Use efficient state management**
+- **Avoid unnecessary re-renders**
+
+---
+alwaysApply: true
+---
+description:
+globs:
+alwaysApply: false
+---

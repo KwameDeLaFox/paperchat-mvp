@@ -1,0 +1,139 @@
+# shadcn/ui Patterns & Best Practices
+
+## Component Usage Guidelines
+
+### Import Pattern
+```tsx
+// Always import from @/components/ui/
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+```
+
+### Button Variants
+```tsx
+// Use appropriate variants for different contexts
+<Button variant="default">Primary Action</Button>
+<Button variant="secondary">Secondary Action</Button>
+<Button variant="outline">Outline Style</Button>
+<Button variant="ghost">Subtle Action</Button>
+<Button variant="destructive">Delete/Danger</Button>
+
+// Use appropriate sizes
+<Button size="sm">Small</Button>
+<Button size="default">Default</Button>
+<Button size="lg">Large</Button>
+```
+
+### Card Components
+```tsx
+// Use Card for content containers
+<Card>
+  <CardHeader>
+    <CardTitle>Title</CardTitle>
+  </CardHeader>
+  <CardContent>
+    Content goes here
+  </CardContent>
+</Card>
+
+// For simple containers
+<Card className="p-6">
+  <CardContent className="p-0">
+    Content
+  </CardContent>
+</Card>
+```
+
+### Form Components
+```tsx
+// Input for single-line text
+<Input 
+  placeholder="Enter text..." 
+  value={value} 
+  onChange={(e) => setValue(e.target.value)}
+/>
+
+// Textarea for multi-line text
+<Textarea 
+  placeholder="Enter message..." 
+  value={value} 
+  onChange={(e) => setValue(e.target.value)}
+  rows={3}
+/>
+```
+
+### Alert Components
+```tsx
+// Success message
+<Alert>
+  <AlertDescription>
+    Operation completed successfully!
+  </AlertDescription>
+</Alert>
+
+// Error message
+<Alert variant="destructive">
+  <AlertDescription>
+    Something went wrong. Please try again.
+  </AlertDescription>
+</Alert>
+```
+
+### Badge Components
+```tsx
+// Status indicators
+<Badge variant="default">Active</Badge>
+<Badge variant="secondary">Pending</Badge>
+<Badge variant="outline">Draft</Badge>
+<Badge variant="destructive">Error</Badge>
+```
+
+## Default Styling Approach
+
+### Use Default shadcn/ui Styling
+```tsx
+// Use default variants without custom styling
+<Button variant="default">Primary Action</Button>
+<Button variant="secondary">Secondary Action</Button>
+<Button variant="outline">Outline Style</Button>
+
+// Avoid custom className overrides
+// ❌ Don't do this:
+// <Button className="bg-blue-500 text-white px-6 py-3 rounded-lg">
+
+// ✅ Do this instead:
+// <Button variant="default" size="lg">
+```
+
+### Minimal Customization
+```tsx
+// Only add layout/spacing classes when necessary
+<Card className="w-full max-w-md">  // ✅ Layout only
+<Button className="w-full">         // ✅ Responsive width only
+
+// Avoid custom colors, borders, shadows
+// Let shadcn/ui handle all styling
+```
+
+## Best Practices
+
+1. **Use Default Styling**: Stick to shadcn/ui default variants and avoid custom styling
+2. **Consistency**: Use the same component variants throughout the app
+3. **Semantic**: Choose components that match their purpose
+4. **Accessibility**: Always include proper ARIA labels and keyboard support
+5. **Responsive**: Design for mobile first, then enhance for desktop
+6. **Performance**: Import only the components you need
+7. **Maintainability**: Use consistent patterns across similar components
+8. **Minimal Customization**: Only add layout/spacing classes, let shadcn/ui handle colors and styling
+
+---
+alwaysApply: true
+---
+description:
+globs:
+alwaysApply: false
+---
