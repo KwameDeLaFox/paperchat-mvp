@@ -277,6 +277,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ documentText }) => {
       {messages.length === 0 && !isLoading && (
         <ChatSuggestions 
           onSuggestionClick={handleSuggestionClick}
+          documentText={documentText}
           documentType={detectDocumentType()}
         />
       )}
