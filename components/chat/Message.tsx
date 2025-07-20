@@ -23,8 +23,8 @@ const Message: React.FC<MessageProps> = ({ message, onFeedback }) => {
   const isError = message.isError;
 
   return (
-    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-6`}>
-      <div className={`flex items-start gap-3 max-w-[80%] ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
+    <div className={`flex ${isUser ? 'justify-end' : 'justify-start'} mb-6 min-w-0`}>
+      <div className={`flex items-start gap-3 max-w-[85%] min-w-0 ${isUser ? 'flex-row-reverse' : 'flex-row'}`}>
         {/* Avatar */}
         <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
           isUser 
@@ -43,23 +43,23 @@ const Message: React.FC<MessageProps> = ({ message, onFeedback }) => {
         </div>
 
         {/* Message Content */}
-        <div className={`flex flex-col ${isUser ? 'items-end' : 'items-start'}`}>
+        <div className={`flex flex-col min-w-0 ${isUser ? 'items-end' : 'items-start'}`}>
           {/* Message Bubble */}
-          <div className={`px-4 py-3 rounded-2xl max-w-full ${
+          <div className={`px-4 py-3 rounded-2xl max-w-full min-w-0 ${
             isUser 
               ? 'bg-gray-100 text-gray-900' 
               : isError
                 ? 'bg-red-50 border border-red-200 text-red-800'
                 : 'bg-white border border-gray-200 text-gray-900'
           }`}>
-            <p className="text-sm whitespace-pre-wrap break-words leading-relaxed">
+            <p className="text-sm whitespace-pre-wrap break-words leading-relaxed overflow-hidden">
               {message.content}
             </p>
           </div>
 
           {/* Timestamp */}
-          <div className={`flex items-center gap-2 mt-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
-            <span className="text-xs text-gray-500">
+          <div className={`flex items-center gap-2 mt-2 min-w-0 ${isUser ? 'justify-end' : 'justify-start'}`}>
+            <span className="text-xs text-gray-500 flex-shrink-0">
               {message.timestamp.toLocaleTimeString([], { 
                 hour: '2-digit', 
                 minute: '2-digit' 
@@ -67,14 +67,14 @@ const Message: React.FC<MessageProps> = ({ message, onFeedback }) => {
             </span>
             
             {/* Sender label */}
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-gray-400 flex-shrink-0">
               {isUser ? 'You' : isError ? 'Error' : 'AI'}
             </span>
           </div>
 
           {/* Feedback buttons for AI messages (not for errors) */}
           {!isUser && !isError && onFeedback && (
-            <div className="flex items-center gap-1 mt-2">
+            <div className="flex items-center gap-1 mt-2 flex-shrink-0">
               <Button
                 variant="ghost"
                 size="sm"

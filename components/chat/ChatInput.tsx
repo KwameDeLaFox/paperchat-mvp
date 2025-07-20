@@ -37,16 +37,16 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled }) =>
   }, [message]);
 
   return (
-    <form onSubmit={handleSubmit} className="border-t border-border p-4 bg-background">
-      <div className="flex space-x-2">
-        <div className="flex-1">
+    <form onSubmit={handleSubmit} className="border-t border-border p-4 bg-background flex-shrink-0 min-w-0">
+      <div className="flex space-x-2 min-w-0">
+        <div className="flex-1 min-w-0">
           <Textarea
             ref={textareaRef}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Ask a question about your document..."
-            className="min-h-[44px] max-h-32 resize-none"
+            className="min-h-[44px] max-h-32 resize-none min-w-0"
             disabled={isLoading || disabled}
             rows={1}
           />
@@ -55,7 +55,7 @@ const ChatInput: React.FC<ChatInputProps> = ({ onSend, isLoading, disabled }) =>
           type="submit"
           size="sm"
           disabled={!message.trim() || isLoading || disabled}
-          className="px-3"
+          className="px-3 flex-shrink-0"
         >
           {isLoading ? (
             <Loader2 className="h-4 w-4 animate-spin" />
