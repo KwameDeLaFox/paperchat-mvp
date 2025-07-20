@@ -376,9 +376,5 @@ interface Message {
 ```
 
 ---
-alwaysApply: true
----
-description:
-globs:
-alwaysApply: false
+globs: *.ts,*.tsx
 ---

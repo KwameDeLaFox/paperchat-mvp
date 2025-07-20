@@ -1,0 +1,47 @@
+# OpenAI API Integration
+
+## API Configuration
+- Use environment variables for API keys
+- Set up proper error handling for API failures
+- Implement retry logic for transient failures
+- Handle rate limiting gracefully
+
+## Context Management
+- Use PDF content as context for AI responses
+- Implement smart chunking for large documents
+- Respect token limits (4000 tokens context window)
+- Prioritize most relevant chunks for user questions
+
+## Prompt Engineering
+- Structure prompts clearly and consistently
+- Include PDF content as context
+- Ask AI to respond based on document content only
+- Handle cases where document doesn't contain relevant information
+
+## Response Handling
+- Parse AI responses properly
+- Handle malformed responses gracefully
+- Show loading states during API calls
+- Implement timeout handling
+
+## Error Scenarios
+- API key invalid/missing
+- Rate limiting exceeded
+- Network connectivity issues
+- Model unavailability
+- Context window exceeded
+
+## User Experience
+- Show typing indicators during AI processing
+- Provide fallback responses for API failures
+- Clear error messages for users
+- Graceful degradation when AI is unavailable
+
+## Security
+- Never expose API keys in client-side code
+- Validate all inputs before sending to API
+- Sanitize responses before displaying
+- Use proper CORS configuration
+---
+alwaysApply: true
+---

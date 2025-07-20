@@ -215,9 +215,5 @@ const handleSubmit = async (e) => {
 ```
 
 ---
-alwaysApply: true
----
-description:
-globs:
-alwaysApply: false
+globs: components/**/*.tsx,pages/**/*.tsx
 ---

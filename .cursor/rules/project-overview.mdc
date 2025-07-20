@@ -37,7 +37,3 @@ Follow the TODO timeline: Upload → Chat → Demo → Feedback → Polish
 ---
 alwaysApply: true
 ---
-description:
-globs:
-alwaysApply: false
----

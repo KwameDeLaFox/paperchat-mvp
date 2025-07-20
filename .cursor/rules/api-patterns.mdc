@@ -296,9 +296,5 @@ function chunkText(text: string, maxLength: number): string[] {
 ```
 
 ---
-alwaysApply: true
----
-description:
-globs:
-alwaysApply: false
+globs: pages/api/**/*.ts
 ---

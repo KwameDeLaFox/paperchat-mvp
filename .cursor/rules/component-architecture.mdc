@@ -1,0 +1,347 @@
+# Component Architecture & Design Patterns
+
+## Component Structure Guidelines
+
+### File Organization
+```
+components/
+├── ui/                    # shadcn/ui components
+│   ├── button.tsx
+│   ├── card.tsx
+│   └── input.tsx
+├── upload/               # Feature-specific components
+│   ├── FileUpload.tsx
+│   └── UploadProgress.tsx
+├── chat/                 # Chat-related components
+│   ├── ChatInterface.tsx
+│   ├── MessageList.tsx
+│   ├── Message.tsx
+│   └── ChatInput.tsx
+├── layout/               # Layout components
+│   ├── SplitLayout.tsx
+│   └── Header.tsx
+└── common/               # Shared components
+    ├── LoadingSpinner.tsx
+    └── ErrorBoundary.tsx
+```
+
+### Component Naming Conventions
+- **PascalCase** for component files: `FileUpload.tsx`
+- **Descriptive names** that indicate purpose: `ChatMessage` not `Message`
+- **Consistent suffixes**: `Interface`, `List`, `Item`, `Input`
+- **Feature prefixes** for organization: `ChatMessage`, `UploadProgress`
+
+## Component Design Patterns
+
+### Container vs Presentational Components
+```tsx
+// Container Component (handles logic)
+const ChatInterface = () => {
+  const [messages, setMessages] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const handleSendMessage = async (content) => {
+    // Logic here
+  };
+  
+  return (
+    <div>
+      <MessageList messages={messages} />
+      <ChatInput onSend={handleSendMessage} isLoading={isLoading} />
+    </div>
+  );
+};
+
+// Presentational Component (pure UI)
+const MessageList = ({ messages }) => {
+  return (
+    <div>
+      {messages.map(message => (
+        <Message key={message.id} message={message} />
+      ))}
+    </div>
+  );
+};
+```
+
+### Props Interface Design
+```tsx
+// ✅ Good: Specific, well-typed props
+interface FileUploadProps {
+  onFileSelect: (file: File) => void;
+  isUploading: boolean;
+  error?: string;
+  accept?: string;
+  maxSize?: number;
+}
+
+// ❌ Bad: Generic props object
+interface FileUploadProps {
+  props: any;
+  config: any;
+}
+```
+
+### State Management Patterns
+```tsx
+// Local state for component-specific data
+const [isExpanded, setIsExpanded] = useState(false);
+const [inputValue, setInputValue] = useState('');
+
+// Props for data passed from parent
+const { messages, onSend } = props;
+
+// Context for global state (if needed)
+const { user, theme } = useContext(AppContext);
+```
+
+## Component Composition
+
+### Compound Components
+```tsx
+// Parent component
+const ChatInterface = () => {
+  return (
+    <ChatContainer>
+      <ChatHeader title="PaperChat" />
+      <ChatMessages />
+      <ChatInput />
+    </ChatContainer>
+  );
+};
+
+// Child components
+const ChatContainer = ({ children }) => (
+  <div className="flex flex-col h-screen">{children}</div>
+);
+
+const ChatHeader = ({ title }) => (
+  <header className="border-b p-4">
+    <h1>{title}</h1>
+  </header>
+);
+```
+
+### Render Props Pattern
+```tsx
+// Component that accepts render function
+const FileUpload = ({ children, onFileSelect }) => {
+  const [file, setFile] = useState(null);
+  
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    setFile(file);
+    onFileSelect(file);
+  };
+  
+  return children({ file, handleFileChange });
+};
+
+// Usage
+<FileUpload onFileSelect={handleFileSelect}>
+  {({ file, handleFileChange }) => (
+    <div>
+      <input type="file" onChange={handleFileChange} />
+      {file && <p>Selected: {file.name}</p>}
+    </div>
+  )}
+</FileUpload>
+```
+
+## Error Handling Patterns
+
+### Error Boundaries
+```tsx
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Component error:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+### Component-Level Error Handling
+```tsx
+const FileUpload = ({ onFileSelect }) => {
+  const [error, setError] = useState(null);
+  
+  const handleFileChange = (e) => {
+    try {
+      const file = e.target.files[0];
+      if (file.size > 10 * 1024 * 1024) {
+        throw new Error('File too large');
+      }
+      onFileSelect(file);
+      setError(null);
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+  
+  return (
+    <div>
+      <input type="file" onChange={handleFileChange} />
+      {error && <div className="text-red-500">{error}</div>}
+    </div>
+  );
+};
+```
+
+## Performance Optimization
+
+### React.memo for Pure Components
+```tsx
+const Message = React.memo(({ message, onFeedback }) => {
+  return (
+    <div>
+      <p>{message.content}</p>
+      <button onClick={() => onFeedback(message.id, 'helpful')}>
+        👍
+      </button>
+    </div>
+  );
+});
+```
+
+### useCallback for Event Handlers
+```tsx
+const ChatInterface = () => {
+  const [messages, setMessages] = useState([]);
+  
+  const handleSendMessage = useCallback(async (content) => {
+    // Send message logic
+  }, []);
+  
+  const handleFeedback = useCallback((messageId, feedback) => {
+    // Feedback logic
+  }, []);
+  
+  return (
+    <div>
+      <MessageList 
+        messages={messages} 
+        onFeedback={handleFeedback} 
+      />
+      <ChatInput onSend={handleSendMessage} />
+    </div>
+  );
+};
+```
+
+### useMemo for Expensive Calculations
+```tsx
+const MessageList = ({ messages, searchTerm }) => {
+  const filteredMessages = useMemo(() => {
+    return messages.filter(message => 
+      message.content.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [messages, searchTerm]);
+  
+  return (
+    <div>
+      {filteredMessages.map(message => (
+        <Message key={message.id} message={message} />
+      ))}
+    </div>
+  );
+};
+```
+
+## Accessibility Patterns
+
+### ARIA Labels and Roles
+```tsx
+const FileUpload = () => {
+  return (
+    <div role="button" tabIndex={0} aria-label="Upload PDF file">
+      <input 
+        type="file" 
+        accept=".pdf"
+        aria-describedby="file-help"
+        className="sr-only"
+      />
+      <span>Choose PDF File</span>
+      <div id="file-help">Maximum file size: 10MB</div>
+    </div>
+  );
+};
+```
+
+### Keyboard Navigation
+```tsx
+const ChatInput = ({ onSend }) => {
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      onSend(e.target.value);
+      e.target.value = '';
+    }
+  };
+  
+  return (
+    <textarea 
+      onKeyPress={handleKeyPress}
+      placeholder="Type your message..."
+      aria-label="Chat message input"
+    />
+  );
+};
+```
+
+## Testing Considerations
+
+### Component Testing Structure
+```tsx
+// Component should be easily testable
+const FileUpload = ({ onFileSelect, isUploading, error }) => {
+  return (
+    <div data-testid="file-upload">
+      <input 
+        type="file" 
+        onChange={(e) => onFileSelect(e.target.files[0])}
+        data-testid="file-input"
+      />
+      {isUploading && <div data-testid="loading">Uploading...</div>}
+      {error && <div data-testid="error">{error}</div>}
+    </div>
+  );
+};
+```
+
+### Props for Testing
+```tsx
+// Make components testable by accepting props
+const Message = ({ message, onFeedback, testId }) => {
+  return (
+    <div data-testid={testId || 'message'}>
+      <p>{message.content}</p>
+      <button 
+        onClick={() => onFeedback(message.id, 'helpful')}
+        data-testid="feedback-helpful"
+      >
+        👍
+      </button>
+    </div>
+  );
+};
+```
+
+---
+alwaysApply: false
+---

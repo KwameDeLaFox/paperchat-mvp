@@ -84,7 +84,3 @@ Keep it simple, functional, and focused on core value proposition. Avoid feature
 ---
 alwaysApply: true
 ---
-description:
-globs:
-alwaysApply: false
----

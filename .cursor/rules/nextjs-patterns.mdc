@@ -1,0 +1,40 @@
+# Next.js Development Patterns
+
+## File Structure
+- Use pages router (not app router) for simplicity
+- API routes go in `/pages/api/`
+- Components go in `/components/`
+- Utilities go in `/utils/`
+
+## Component Patterns
+- Use functional components with hooks
+- Keep components simple and focused
+- Use Tailwind for styling (no custom CSS unless necessary)
+- Export components as default exports
+
+## State Management
+- Use `useState` for local component state
+- Use `useEffect` for side effects
+- Keep state as close to where it's used as possible
+- No complex state management libraries (Redux, Zustand, etc.)
+
+## API Routes
+- Use `/pages/api/` for backend functionality
+- Handle errors gracefully with try/catch
+- Return proper HTTP status codes
+- Use environment variables for API keys
+
+## Error Handling
+- Always wrap API calls in try/catch
+- Show user-friendly error messages
+- Log errors for debugging
+- Graceful degradation when services are unavailable
+
+## Performance
+- Keep bundle size minimal
+- Use dynamic imports if needed
+- Optimize images with Next.js Image component
+- No premature optimization - focus on MVP functionality
+---
+alwaysApply: true
+---

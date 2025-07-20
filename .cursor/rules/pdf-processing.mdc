@@ -1,0 +1,41 @@
+# PDF Processing Guidelines
+
+## File Validation
+- Validate file type (PDF only)
+- Check file size (max 10MB)
+- Handle corrupted files gracefully
+- Detect password-protected PDFs
+
+## Text Extraction
+- Use `pdf-parse` library for text extraction
+- Handle extraction failures gracefully
+- Provide clear error messages for failed extractions
+- Show loading indicators during processing
+
+## Text Chunking
+- Split large documents into manageable chunks
+- Respect OpenAI context window limits
+- Keep chunks semantically meaningful
+- Use smart chunking for better AI responses
+
+## Error Messages
+Use these specific error messages from the PRD:
+- "File too large (max 10MB)"
+- "Please upload a PDF file"
+- "Unable to read this PDF. Try a different file."
+- "This document is quite long. For best results, try asking specific questions."
+
+## Processing Flow
+1. File upload → validation
+2. Text extraction → chunking
+3. Store in memory (no persistence)
+4. Ready for chat
+
+## Memory Management
+- Process files immediately
+- Don't store files permanently
+- Clear memory after processing
+- Handle concurrent uploads gracefully
+---
+alwaysApply: true
+---
