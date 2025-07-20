@@ -235,7 +235,7 @@ const ChatSuggestions: React.FC<ChatSuggestionsProps> = ({
       {
         icon: <BookOpen className="h-4 w-4" />,
         text: "What's the main argument?",
-        color: "text-blue-600"
+        color: "text-green-600"
       },
       {
         icon: <Quote className="h-4 w-4" />,
@@ -302,7 +302,7 @@ const ChatSuggestions: React.FC<ChatSuggestionsProps> = ({
               variant="outline"
               size="sm"
               onClick={() => onSuggestionClick(suggestion.text)}
-              className="h-auto py-2 px-3 text-xs border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors max-w-full"
+              className="h-auto py-2 px-3 text-xs border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors max-w-full bg-white"
             >
               <span className={`mr-2 ${suggestion.color} flex-shrink-0`}>
                 {suggestion.icon}
@@ -329,7 +329,7 @@ const ChatSuggestions: React.FC<ChatSuggestionsProps> = ({
             variant="outline"
             size="sm"
             onClick={() => onSuggestionClick(suggestion.text)}
-            className="h-auto py-2 px-3 text-xs border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors max-w-full"
+            className="h-auto py-2 px-3 text-xs border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors max-w-full bg-white"
           >
             <span className={`mr-2 ${suggestion.color} flex-shrink-0`}>
               {suggestion.icon}

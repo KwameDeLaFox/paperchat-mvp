@@ -24,7 +24,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, onFeedback }) => {
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto p-4">
+    <div className="flex-1 overflow-y-auto p-4 bg-[#f5f5f5] flex flex-col gap-3">
       {messages.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-full text-center">
           <div className="mb-6">
