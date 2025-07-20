@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import FileUpload from '@/components/upload/FileUpload';
 import SplitLayout from '@/components/layout/SplitLayout';
+import ChatInterface from '@/components/chat/ChatInterface';
 
 interface DocumentInfo {
   text: string;
@@ -52,24 +53,7 @@ export default function Home() {
   // Show split layout with document loaded
   return (
     <SplitLayout documentInfo={documentInfo}>
-      <div className="flex flex-col h-full">
-        {/* Chat messages will go here */}
-        <div className="flex-1 p-4 overflow-y-auto">
-          <div className="text-center text-gray-500">
-            <p>Chat interface coming in next milestone...</p>
-            <p className="text-sm mt-2">
-              Document: {documentInfo.filename} ({documentInfo.pages} pages)
-            </p>
-          </div>
-        </div>
-        
-        {/* Chat input will go here */}
-        <div className="border-t border-gray-200 p-4">
-          <div className="text-center text-gray-500">
-            <p>Chat input coming in next milestone...</p>
-          </div>
-        </div>
-      </div>
+      <ChatInterface documentText={documentInfo.text} />
     </SplitLayout>
   );
 } 
