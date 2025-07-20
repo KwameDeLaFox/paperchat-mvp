@@ -16,7 +16,7 @@ interface MessageProps {
   onFeedback?: (messageId: string, feedback: 'helpful' | 'unhelpful') => void;
 }
 
-const Message: React.FC<MessageProps> = ({ message, onFeedback }) => {
+const Message: React.FC<MessageProps> = React.memo(({ message, onFeedback }) => {
   const isUser = message.sender === 'user';
   const isError = message.isError;
 
@@ -78,6 +78,8 @@ const Message: React.FC<MessageProps> = ({ message, onFeedback }) => {
       </div>
     </div>
   );
-};
+});
+
+Message.displayName = 'Message';
 
 export default Message; 

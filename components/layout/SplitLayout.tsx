@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, MessageSquare } from 'lucide-react';
@@ -15,53 +15,74 @@ interface SplitLayoutProps {
 
 const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => {
   const [leftWidth, setLeftWidth] = useState(50); // 50% default
-  const [isDragging, setIsDragging] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const rightPanelRef = useRef<HTMLDivElement>(null);
+  const splitterRef = useRef<HTMLDivElement>(null);
 
   // Handle mouse down on splitter
-  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+  const handleMouseDown = (e: React.MouseEvent) => {
     e.preventDefault();
-    setIsDragging(true);
     
     const startX = e.clientX;
-    const startWidth = leftWidth;
+    const containerWidth = containerRef.current?.offsetWidth || 0;
+    const startLeftWidth = leftWidth;
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!containerRef.current) return;
-      
-      const containerRect = containerRef.current.getBoundingClientRect();
       const deltaX = e.clientX - startX;
-      const deltaPercent = (deltaX / containerRect.width) * 100;
-      const newWidth = startWidth + deltaPercent;
+      const deltaPercent = (deltaX / containerWidth) * 100;
+      const newWidth = startLeftWidth + deltaPercent;
       
       // Constrain to reasonable bounds (20% - 80%)
       const constrainedWidth = Math.max(20, Math.min(80, newWidth));
-      setLeftWidth(constrainedWidth);
+      
+      // Update CSS directly for smooth dragging
+      if (leftPanelRef.current && rightPanelRef.current) {
+        leftPanelRef.current.style.width = `${constrainedWidth}%`;
+        rightPanelRef.current.style.width = `${100 - constrainedWidth}%`;
+      }
     };
 
     const handleMouseUp = () => {
-      setIsDragging(false);
+      // Update React state only when dragging ends
+      if (leftPanelRef.current) {
+        const finalWidth = parseFloat(leftPanelRef.current.style.width);
+        setLeftWidth(finalWidth);
+      }
+      
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
 
     document.addEventListener('mousemove', handleMouseMove);
     document.addEventListener('mouseup', handleMouseUp);
-  }, [leftWidth]);
+  };
 
   // Handle double click to reset to 50/50
-  const handleDoubleClick = useCallback(() => {
+  const handleDoubleClick = () => {
     setLeftWidth(50);
-  }, []);
+    if (leftPanelRef.current && rightPanelRef.current) {
+      leftPanelRef.current.style.width = '50%';
+      rightPanelRef.current.style.width = '50%';
+    }
+  };
+
+  // Update CSS when React state changes
+  useEffect(() => {
+    if (leftPanelRef.current && rightPanelRef.current) {
+      leftPanelRef.current.style.width = `${leftWidth}%`;
+      rightPanelRef.current.style.width = `${100 - leftWidth}%`;
+    }
+  }, [leftWidth]);
 
   return (
     <div 
       ref={containerRef}
       className="flex h-screen bg-muted/30 overflow-hidden"
-      style={{ cursor: isDragging ? 'col-resize' : 'default' }}
     >
       {/* PDF Viewer Section */}
       <div 
+        ref={leftPanelRef}
         className="border-r border-border bg-background overflow-hidden"
         style={{ width: `${leftWidth}%` }}
       >
@@ -101,9 +122,8 @@ const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => 
 
       {/* Draggable Splitter */}
       <div
-        className={`w-1 bg-gray-300 hover:bg-blue-400 cursor-col-resize relative transition-colors ${
-          isDragging ? 'bg-blue-400' : ''
-        }`}
+        ref={splitterRef}
+        className="w-1 bg-gray-300 hover:bg-blue-400 cursor-col-resize relative transition-colors"
         onMouseDown={handleMouseDown}
         onDoubleClick={handleDoubleClick}
         title="Drag to resize • Double-click to reset to 50/50"
@@ -116,6 +136,7 @@ const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => 
 
       {/* Chat Interface Section */}
       <div 
+        ref={rightPanelRef}
         className="flex flex-col bg-background overflow-hidden"
         style={{ width: `${100 - leftWidth}%` }}
       >
