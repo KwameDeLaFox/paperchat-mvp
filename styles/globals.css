@@ -83,11 +83,15 @@ body {
 /* PDF viewer custom styles */
 .react-pdf__Page {
   margin: 0 auto;
+  max-width: 100% !important;
+  overflow: hidden;
 }
 
 .react-pdf__Page__canvas {
   display: block;
   margin: 0 auto;
+  max-width: 100% !important;
+  height: auto !important;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
@@ -97,4 +101,10 @@ body {
 
 .react-pdf__Page__annotations {
   display: none;
+}
+
+/* Ensure content doesn't overflow viewport */
+.react-pdf__Document {
+  max-width: 100%;
+  overflow: hidden;
 }

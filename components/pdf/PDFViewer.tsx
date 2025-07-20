@@ -71,8 +71,8 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
 
   if (viewMode === 'text') {
     return (
-      <div className="h-full flex flex-col">
-        <div className="flex items-center justify-between p-4 border-b bg-gray-50">
+      <div className="h-full flex flex-col min-w-0">
+        <div className="flex items-center justify-between p-4 border-b bg-gray-50 flex-shrink-0">
           <h3 className="text-lg font-semibold">Document Text</h3>
           <button
             onClick={() => setViewMode('pdf')}
@@ -81,9 +81,9 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
             Switch to PDF View
           </button>
         </div>
-        <div className="flex-1 overflow-auto p-6">
+        <div className="flex-1 overflow-auto p-6 min-w-0">
           <div className="prose max-w-none">
-            <pre className="whitespace-pre-wrap text-sm leading-relaxed">
+            <pre className="whitespace-pre-wrap text-sm leading-relaxed break-words">
               {documentInfo.text}
             </pre>
           </div>
@@ -93,47 +93,47 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
   }
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col min-w-0">
       {/* PDF Controls */}
-      <div className="flex items-center justify-between p-4 border-b bg-gray-50">
-        <div className="flex items-center space-x-4">
-          <h3 className="text-lg font-semibold">PDF Viewer</h3>
+      <div className="flex items-center justify-between p-4 border-b bg-gray-50 flex-shrink-0">
+        <div className="flex items-center space-x-4 min-w-0">
+          <h3 className="text-lg font-semibold truncate">PDF Viewer</h3>
           
           {/* Page Navigation */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <button
               onClick={() => changePage(-1)}
               disabled={pageNumber <= 1}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               Previous
             </button>
-            <span className="text-sm">
+            <span className="text-sm whitespace-nowrap">
               Page {pageNumber} of {numPages}
             </span>
             <button
               onClick={() => changePage(1)}
               disabled={pageNumber >= numPages}
-              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed text-sm"
             >
               Next
             </button>
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2 flex-shrink-0">
             <button
               onClick={() => changeScale(scale - 0.25)}
               disabled={scale <= 0.5}
-              className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
+              className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 text-sm"
             >
               -
             </button>
-            <span className="text-sm min-w-[60px] text-center">{Math.round(scale * 100)}%</span>
+            <span className="text-sm min-w-[60px] text-center whitespace-nowrap">{Math.round(scale * 100)}%</span>
             <button
               onClick={() => changeScale(scale + 0.25)}
               disabled={scale >= 3.0}
-              className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50"
+              className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 disabled:opacity-50 text-sm"
             >
               +
             </button>
@@ -142,7 +142,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
           {/* Rotation */}
           <button
             onClick={rotate}
-            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm whitespace-nowrap"
           >
             Rotate ({rotation}°)
           </button>
@@ -150,7 +150,7 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
           {/* Reset */}
           <button
             onClick={resetView}
-            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+            className="px-3 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 text-sm whitespace-nowrap"
           >
             Reset
           </button>
@@ -159,14 +159,14 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
         {/* View Mode Toggle */}
         <button
           onClick={() => setViewMode('text')}
-          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+          className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex-shrink-0 text-sm"
         >
           Switch to Text View
         </button>
       </div>
 
       {/* PDF Content */}
-      <div className="flex-1 overflow-auto p-4 bg-gray-100">
+      <div className="flex-1 overflow-auto p-4 bg-gray-100 min-w-0">
         {loading && (
           <div className="flex items-center justify-center h-full">
             <div className="text-center">
@@ -191,28 +191,31 @@ const PDFViewer: React.FC<PDFViewerProps> = ({ documentInfo }) => {
         )}
 
         {!loading && !error && (
-          <div className="flex justify-center">
-            <Document
-              file={pdfUrl}
-              onLoadSuccess={onDocumentLoadSuccess}
-              onLoadError={onDocumentLoadError}
-              loading={
-                <div className="flex items-center justify-center p-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                </div>
-              }
-            >
-              <Page
-                pageNumber={pageNumber}
-                scale={scale}
-                rotate={rotation}
+          <div className="flex justify-center w-full">
+            <div className="max-w-full overflow-hidden">
+              <Document
+                file={pdfUrl}
+                onLoadSuccess={onDocumentLoadSuccess}
+                onLoadError={onDocumentLoadError}
                 loading={
                   <div className="flex items-center justify-center p-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                   </div>
                 }
-              />
-            </Document>
+              >
+                <Page
+                  pageNumber={pageNumber}
+                  scale={scale}
+                  rotate={rotation}
+                  loading={
+                    <div className="flex items-center justify-center p-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                    </div>
+                  }
+                  className="max-w-full h-auto"
+                />
+              </Document>
+            </div>
           </div>
         )}
       </div>
