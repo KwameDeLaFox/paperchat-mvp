@@ -51,7 +51,7 @@ const Features = () => {
 
   return (
     <section className="py-24 bg-muted/30">
-      <div className="container px-4 md:px-6 mx-auto">
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
         <div className="text-center space-y-6 mb-20">
           <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl leading-tight">
             Everything You Need to Chat with PDFs
@@ -61,7 +61,7 @@ const Features = () => {
           </p>
         </div>
 
-        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
           {features.map((feature, index) => (
             <Card key={index} className="group hover:shadow-lg transition-all duration-300 border-0 bg-background/50 backdrop-blur-sm h-full">
               <CardHeader className="pb-6">

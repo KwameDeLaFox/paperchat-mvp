@@ -153,9 +153,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, onError }) => {
   return (
     <div className="w-full max-w-md mx-auto">
       {error && (
-        <Alert className="mb-4 border-red-200 bg-red-50">
-          <AlertCircle className="h-4 w-4 text-red-600" />
-          <AlertDescription className="text-red-800">
+        <Alert className="mb-4 border-destructive/20 bg-destructive/10">
+          <AlertCircle className="h-4 w-4 text-destructive" />
+          <AlertDescription className="text-destructive">
             <div className="flex items-center justify-between">
               <span>{error.message}</span>
               {error.retryable && retryCount < MAX_RETRIES && (
@@ -163,7 +163,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, onError }) => {
                   variant="outline"
                   size="sm"
                   onClick={handleRetry}
-                  className="ml-2 h-8 px-3 text-xs border-red-300 text-red-700 hover:bg-red-100"
+                  className="ml-2 h-8 px-3 text-xs"
                 >
                   <RefreshCw className="h-3 w-3 mr-1" />
                   Retry
@@ -171,7 +171,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, onError }) => {
               )}
             </div>
             {retryCount > 0 && retryCount < MAX_RETRIES && (
-              <div className="text-xs text-red-600 mt-1">
+              <div className="text-xs text-destructive/80 mt-1">
                 Retry attempt {retryCount} of {MAX_RETRIES}
               </div>
             )}
@@ -183,24 +183,24 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, onError }) => {
         isDragOver 
           ? 'border-primary bg-primary/5' 
           : error 
-            ? 'border-red-300 bg-red-50' 
-            : 'border-gray-300 hover:border-primary/50'
+            ? 'border-destructive/30 bg-destructive/5' 
+            : 'border-border hover:border-primary/50'
       }`}>
         <CardContent className="p-6">
           <div className="text-center">
-            <div className="mx-auto w-12 h-12 mb-4 flex items-center justify-center rounded-full bg-gray-100">
+            <div className="mx-auto w-12 h-12 mb-4 flex items-center justify-center rounded-full bg-muted">
               {isUploading ? (
                 <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
               ) : (
-                <Upload className="h-6 w-6 text-gray-600" />
+                <Upload className="h-6 w-6 text-muted-foreground" />
               )}
             </div>
             
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            <h3 className="text-lg font-semibold text-foreground mb-2">
               {isUploading ? 'Uploading PDF...' : 'Upload your PDF'}
             </h3>
             
-            <p className="text-sm text-gray-600 mb-4">
+            <p className="text-sm text-muted-foreground mb-4">
               {isUploading 
                 ? 'Please wait while we process your document...'
                 : 'Drag and drop your PDF here, or click to browse'
@@ -218,7 +218,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ onFileUpload, onError }) => {
                   Choose PDF File
                 </Button>
                 
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Maximum file size: 10MB
                 </p>
               </div>

@@ -19,7 +19,7 @@ export default function HowItWorks() {
         <Header />
         
         <main className="py-20">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6 max-w-7xl">
             {/* Hero Section */}
             <div className="text-center space-y-4 mb-16">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
@@ -31,7 +31,7 @@ export default function HowItWorks() {
             </div>
 
             {/* Process Steps */}
-            <div className="grid gap-8 md:grid-cols-3 mb-16">
+            <div className="grid gap-8 md:grid-cols-3 mb-16 max-w-6xl mx-auto">
               <Card className="text-center">
                 <CardHeader>
                   <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -76,7 +76,7 @@ export default function HowItWorks() {
             </div>
 
             {/* Technology Section */}
-            <div className="grid gap-8 md:grid-cols-2 items-center mb-16">
+            <div className="grid gap-8 md:grid-cols-2 items-center mb-16 max-w-6xl mx-auto">
               <div className="space-y-6">
                 <h2 className="text-3xl font-bold">Powered by Advanced AI</h2>
                 <p className="text-muted-foreground text-lg">

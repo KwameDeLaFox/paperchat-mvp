@@ -13,7 +13,7 @@ const Hero = () => {
 
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/20 py-24 lg:py-32">
-      <div className="container px-4 md:px-6 mx-auto">
+      <div className="container mx-auto px-4 md:px-6 max-w-7xl">
         <div className="grid gap-12 lg:grid-cols-2 lg:gap-16 items-center">
           {/* Content */}
           <div className="space-y-10">
@@ -87,8 +87,8 @@ const Hero = () => {
           </div>
 
           {/* Hero Visual */}
-          <div className="relative">
-            <div className="relative mx-auto max-w-md">
+          <div className="relative flex justify-center lg:justify-end">
+            <div className="relative max-w-md w-full">
               {/* Main illustration container */}
               <div className="relative rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 p-8 shadow-2xl">
                 {/* PDF Document */}

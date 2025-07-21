@@ -131,15 +131,15 @@ describe('Error Handling', () => {
 
     describe('retry utilities', () => {
       it('should determine if error is retryable', () => {
-        const retryableError = { retryable: true };
-        const nonRetryableError = { retryable: false };
+        const retryableError = { message: 'Test error', retryable: true };
+        const nonRetryableError = { message: 'Test error', retryable: false };
         
         expect(ErrorHandler.isRetryableError(retryableError)).toBe(true);
         expect(ErrorHandler.isRetryableError(nonRetryableError)).toBe(false);
       });
 
       it('should determine if should retry based on count', () => {
-        const error = { retryable: true };
+        const error = { message: 'Test error', retryable: true };
         
         expect(ErrorHandler.shouldRetry(error, 0, 3)).toBe(true);
         expect(ErrorHandler.shouldRetry(error, 2, 3)).toBe(true);

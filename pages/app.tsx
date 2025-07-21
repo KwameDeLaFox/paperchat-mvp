@@ -3,6 +3,7 @@ import Head from 'next/head';
 import FileUpload from '@/components/upload/FileUpload';
 import SplitLayout from '@/components/layout/SplitLayout';
 import ChatInterface from '@/components/chat/ChatInterface';
+import AppHeader from '@/components/layout/AppHeader';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, RefreshCw } from 'lucide-react';
@@ -100,6 +101,11 @@ export default function App() {
     handleDemoMode();
   };
 
+  const handleBackToUpload = () => {
+    setDocumentInfo(null);
+    setError(null);
+  };
+
   // Show file upload if no document is loaded
   if (!documentInfo) {
     return (
@@ -109,64 +115,67 @@ export default function App() {
           <meta name="description" content="Upload your PDF and start chatting with AI" />
         </Head>
         
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-background">
-          <div className="w-full max-w-md">
-            <div className="text-center mb-8">
-              <h1 className="text-3xl font-bold text-foreground mb-2">
-                PaperChat
-              </h1>
-              <p className="text-muted-foreground">
-                Upload a PDF to start chatting with your document
-              </p>
-            </div>
+        <div className="flex flex-col h-screen">
+          <AppHeader />
+          <div className="flex flex-col items-center justify-center flex-1 p-4 bg-background">
+            <div className="w-full max-w-md">
+              <div className="text-center mb-8">
+                <h1 className="text-3xl font-bold text-foreground mb-2">
+                  PaperChat
+                </h1>
+                <p className="text-muted-foreground">
+                  Upload a PDF to start chatting with your document
+                </p>
+              </div>
 
-            {error && (
-              <Alert className="mb-4 border-destructive/20 bg-destructive/10">
-                <AlertCircle className="h-4 w-4 text-destructive" />
-                <AlertDescription className="text-destructive">
-                  <div className="flex items-center justify-between">
-                    <span>{error.message}</span>
-                    {error.retryable && (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleRetryDemo}
-                        className="ml-2 h-8 px-3 text-xs"
-                      >
-                        <RefreshCw className="h-3 w-3 mr-1" />
-                        Retry
-                      </Button>
-                    )}
-                  </div>
-                </AlertDescription>
-              </Alert>
-            )}
+              {error && (
+                <Alert className="mb-4 border-destructive/20 bg-destructive/10">
+                  <AlertCircle className="h-4 w-4 text-destructive" />
+                  <AlertDescription className="text-destructive">
+                    <div className="flex items-center justify-between">
+                      <span>{error.message}</span>
+                      {error.retryable && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleRetryDemo}
+                          className="ml-2 h-8 px-3 text-xs"
+                        >
+                          <RefreshCw className="h-3 w-3 mr-1" />
+                          Retry
+                        </Button>
+                      )}
+                    </div>
+                  </AlertDescription>
+                </Alert>
+              )}
 
-            <FileUpload 
-              onFileUpload={handleFileUpload}
-              onError={handleUploadError}
-            />
+              <FileUpload 
+                onFileUpload={handleFileUpload}
+                onError={handleUploadError}
+              />
 
-            <div className="text-center mt-6">
-              <Button 
-                onClick={handleDemoMode}
-                variant="outline"
-                size="sm"
-                disabled={isLoadingDemo}
-                className="mb-2"
-              >
-                {isLoadingDemo ? (
-                  <>
-                    <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current mr-2"></div>
-                    Loading Demo...
-                  </>
-                ) : (
-                  'Try Demo Mode'
-                )}
-              </Button>
-              <p className="text-xs text-muted-foreground">
-                Test with a sample document
-              </p>
+              <div className="text-center mt-6">
+                <Button 
+                  onClick={handleDemoMode}
+                  variant="outline"
+                  size="sm"
+                  disabled={isLoadingDemo}
+                  className="mb-2"
+                >
+                  {isLoadingDemo ? (
+                    <>
+                      <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-current mr-2"></div>
+                      Loading Demo...
+                    </>
+                  ) : (
+                    'Try Demo Mode'
+                  )}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Test with a sample document
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -182,9 +191,17 @@ export default function App() {
         <meta name="description" content="Chat with your PDF document" />
       </Head>
       
-      <SplitLayout documentInfo={documentInfo}>
-        <ChatInterface documentText={documentInfo.text} />
-      </SplitLayout>
+      <div className="flex flex-col h-screen">
+        <AppHeader 
+          documentInfo={documentInfo}
+          onBackToUpload={handleBackToUpload}
+        />
+        <div className="flex-1 overflow-hidden">
+          <SplitLayout documentInfo={documentInfo}>
+            <ChatInterface documentText={documentInfo.text} />
+          </SplitLayout>
+        </div>
+      </div>
     </>
   );
 } 

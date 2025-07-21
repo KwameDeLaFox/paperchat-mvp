@@ -16,7 +16,7 @@ interface SplitLayoutProps {
 
 const SplitLayout: React.FC<SplitLayoutProps> = ({ children, documentInfo }) => {
   return (
-    <div className="h-screen bg-muted/30 flex overflow-hidden">
+    <div className="h-full bg-muted/30 flex overflow-hidden">
       {/* Left */}
       <div className="bg-background overflow-hidden min-w-0 w-1/2">
         {documentInfo ? (

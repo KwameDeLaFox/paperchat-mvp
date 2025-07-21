@@ -19,7 +19,7 @@ export default function Pricing() {
         <Header />
         
         <main className="py-20">
-          <div className="container px-4 md:px-6">
+          <div className="container mx-auto px-4 md:px-6 max-w-7xl">
             {/* Hero Section */}
             <div className="text-center space-y-4 mb-16">
               <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
@@ -31,7 +31,7 @@ export default function Pricing() {
             </div>
 
             {/* Pricing Cards */}
-            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto">
               {/* Free Tier */}
               <Card className="relative">
                 <CardHeader className="text-center">
